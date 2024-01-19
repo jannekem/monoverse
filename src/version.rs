@@ -1,6 +1,6 @@
-use anyhow::Result;
 use chrono::Datelike;
 
+#[derive(Debug)]
 pub struct Version {
     pub major: u32,
     pub minor: u32,
@@ -8,16 +8,25 @@ pub struct Version {
 }
 
 impl Version {
-    pub fn parse(version: &str) -> Result<Self> {
+    pub fn parse(version: &str) -> Self {
         let mut parts = version.split('.');
-        let major = parts.next().unwrap().parse()?;
-        let minor = parts.next().unwrap().parse()?;
-        let patch = parts.next().unwrap().parse()?;
-        Ok(Self {
+        let major = parts.next().unwrap_or("").parse().unwrap_or_else(|_| {
+            log::warn!("Failed to parse major version, defaulting to 0");
+            0
+        });
+        let minor = parts.next().unwrap_or("").parse().unwrap_or_else(|_| {
+            log::warn!("Failed to parse minor version, defaulting to 0");
+            0
+        });
+        let patch = parts.next().unwrap_or("").parse().unwrap_or_else(|_| {
+            log::warn!("Failed to parse patch version, defaulting to 0");
+            0
+        });
+        Self {
             major,
             minor,
             patch,
-        })
+        }
     }
 
     /// Bump version to the next monoversion
