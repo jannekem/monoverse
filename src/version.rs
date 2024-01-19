@@ -32,7 +32,7 @@ impl Version {
     /// Bump version to the next monoversion
     pub fn bump(self) -> Self {
         let now = chrono::Utc::now();
-        let year: u32 = now.year() as u32 - 2000;
+        let year = now.year() as u32 - 2000;
         let month = now.month();
 
         if year != self.major || month != self.minor {
