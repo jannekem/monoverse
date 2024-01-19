@@ -1,8 +1,9 @@
-use anyhow::{Context, Result};
+use anyhow::Result;
 use clap::Parser;
 
 mod cli;
 mod git;
+mod settings;
 mod status;
 
 use cli::Opts;
@@ -22,8 +23,9 @@ fn run() -> Result<()> {
         .verbosity(log::Level::Info)
         .init()
         .unwrap();
-
-    let repo = Repository::open(&opts.repo_path.unwrap())?;
+    let settings = settings::Settings::new(opts.repo_path.as_ref().unwrap())?;
+    log::info!("Settings: {:?}", settings);
+    let repo = Repository::open(opts.repo_path.as_ref().unwrap())?;
     let has_changed = git::has_path_changed(&repo, &opts.app)?;
     println!("Has changed: {:?}", has_changed);
     Ok(())
