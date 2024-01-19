@@ -3,10 +3,22 @@ use clap::Parser;
 #[derive(Parser)]
 #[clap(name = env!("CARGO_PKG_NAME"), version = env!("CARGO_PKG_VERSION"))]
 pub struct Opts {
-    /// The application to be updated
-    pub app: String,
+    #[clap(subcommand)]
+    pub subcmd: SubCommand,
 
     /// Repository path
-    #[clap(long, default_value = ".")]
+    #[clap(long, default_value = ".", global = true)]
     pub repo_path: Option<String>,
+}
+
+#[derive(Parser)]
+pub enum SubCommand {
+    /// Release a project
+    Release(Release),
+}
+
+#[derive(Parser)]
+pub struct Release {
+    /// Application name
+    pub app: String,
 }

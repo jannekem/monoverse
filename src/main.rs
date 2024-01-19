@@ -26,7 +26,16 @@ fn run() -> Result<()> {
     let settings = settings::Settings::new(opts.repo_path.as_ref().unwrap())?;
     log::info!("Settings: {:?}", settings);
     let repo = Repository::open(opts.repo_path.as_ref().unwrap())?;
-    let has_changed = git::has_path_changed(&repo, &opts.app)?;
-    println!("Has changed: {:?}", has_changed);
+    match opts.subcmd {
+        cli::SubCommand::Release(release) => {
+            let app = settings
+                .projects
+                .get(&release.app)
+                .ok_or_else(|| anyhow::anyhow!("No project found with name: {}", release.app))?;
+            log::info!("App: {:?}", app);
+            let status = git::has_path_changed(&repo, &app.path)?;
+            log::info!("Status: {:?}", status);
+        }
+    }
     Ok(())
 }
