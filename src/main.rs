@@ -3,6 +3,7 @@ use clap::Parser;
 
 mod cli;
 mod git;
+mod project_types;
 mod settings;
 mod status;
 

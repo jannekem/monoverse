@@ -3,15 +3,17 @@ use config::Config;
 use serde::Deserialize;
 use std::{collections::HashMap, path::Path};
 
-#[derive(Debug, Deserialize)]
+use crate::project_types::ProjectType;
+
+#[derive(Deserialize, Debug)]
 pub struct Settings {
     pub projects: HashMap<String, AppSettings>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct AppSettings {
     #[serde(rename = "type")]
-    pub type_: String,
+    pub project_type: ProjectType,
     pub path: String,
 }
 
