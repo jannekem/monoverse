@@ -1,7 +1,10 @@
 use anyhow::Result;
 use config::Config;
 use serde::Deserialize;
-use std::{collections::HashMap, path::Path};
+use std::{
+    collections::HashMap,
+    path::{Path, PathBuf},
+};
 
 use crate::project_types::ProjectType;
 
@@ -14,7 +17,7 @@ pub struct Settings {
 pub struct AppSettings {
     #[serde(rename = "type")]
     pub project_type: ProjectType,
-    pub path: String,
+    pub path: PathBuf,
 }
 
 impl Settings {

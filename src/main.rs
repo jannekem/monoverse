@@ -34,8 +34,14 @@ fn run() -> Result<()> {
                 .get(&release.app)
                 .ok_or_else(|| anyhow::anyhow!("No project found with name: {}", release.app))?;
             log::info!("App: {:?}", app);
-            let status = git::has_path_changed(&repo, &app.path)?;
-            log::info!("Status: {:?}", status);
+            // TODO: Hardcoded to package.json for now
+            let package_json_path = app.path.join("package.json");
+            log::info!("Package.json path: {:?}", package_json_path);
+            let release_commit_id = git::get_commit_id_for_line(&repo, &package_json_path, 3)?;
+            let has_changed =
+                git::has_path_changed_since(&repo, &package_json_path, release_commit_id)?;
+
+            log::info!("Has project changed since last release: {:?}", has_changed);
         }
     }
     Ok(())

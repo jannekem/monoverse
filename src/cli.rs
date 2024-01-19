@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use clap::Parser;
 
 #[derive(Parser)]
@@ -8,7 +10,7 @@ pub struct Opts {
 
     /// Repository path
     #[clap(long, default_value = ".", global = true)]
-    pub repo_path: Option<String>,
+    pub repo_path: Option<PathBuf>,
 }
 
 #[derive(Parser)]
