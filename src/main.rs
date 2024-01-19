@@ -6,6 +6,7 @@ mod git;
 mod project_types;
 mod settings;
 mod status;
+mod version;
 
 use cli::Opts;
 use git2::Repository;
