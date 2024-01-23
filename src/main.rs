@@ -10,6 +10,8 @@ mod version;
 use cli::Opts;
 use git2::Repository;
 
+use crate::project_types::ProjectFile;
+
 fn main() {
     if let Err(e) = run() {
         log::error!("Error: {}", e);
@@ -40,6 +42,17 @@ fn run() -> Result<()> {
             let release_commit_id = git::get_commit_id_for_line(&repo, &package_json_path, 3)?;
             let has_changed =
                 git::has_path_changed_since(&repo, &package_json_path, release_commit_id)?;
+            if has_changed {
+                match app.project_type {
+                    project_types::ProjectType::Node => {
+                        let node_project = project_types::node::NodeProject::new(
+                            app.path.clone(),
+                            opts.repo_path.as_ref().unwrap().clone(),
+                        );
+                        node_project.bump_version()?;
+                    }
+                }
+            }
 
             log::info!("Has project changed since last release: {:?}", has_changed);
         }

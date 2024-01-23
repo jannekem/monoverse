@@ -1,5 +1,8 @@
+use core::fmt;
+
 use chrono::Datelike;
 
+/// A version in the format of YY.MM.PATCH
 #[derive(Debug)]
 pub struct Version {
     pub major: u32,
@@ -48,5 +51,11 @@ impl Version {
                 patch: self.patch + 1,
             }
         }
+    }
+}
+
+impl fmt::Display for Version {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
     }
 }
