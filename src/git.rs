@@ -11,6 +11,7 @@ pub fn has_path_changed_since<P: AsRef<Path>>(
 ) -> Result<bool> {
     let previous_release = repo.find_commit(commit_id)?;
     let head = repo.head()?.peel_to_commit()?;
+    log::debug!("Comparing {:?} to {:?}", previous_release, head);
     let mut opts = DiffOptions::new();
     let diff = repo.diff_tree_to_tree(
         Some(&previous_release.tree()?),
@@ -18,7 +19,10 @@ pub fn has_path_changed_since<P: AsRef<Path>>(
         Some(&mut opts),
     )?;
     Ok(diff.deltas().any(|delta| match delta.new_file().path() {
-        Some(file_path) => file_path.starts_with(path),
+        Some(file_path) => {
+            log::info!("Comparing {:?} to {:?}", file_path, path.as_ref());
+            file_path.starts_with(path)
+        }
         None => false,
     }))
 }

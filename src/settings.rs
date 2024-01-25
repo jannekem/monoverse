@@ -13,10 +13,11 @@ pub struct Settings {
     pub projects: HashMap<String, AppSettings>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct AppSettings {
     #[serde(rename = "type")]
     pub project_type: ProjectType,
+    #[serde(default)]
     pub path: PathBuf,
 }
 
@@ -28,5 +29,20 @@ impl Settings {
             .build()?;
         let deserialized: Self = settings.try_deserialize()?;
         Ok(deserialized)
+    }
+}
+
+impl AppSettings {
+    /// Return the path to the version file for each project type
+    ///
+    /// If the project path is defined as "." then it is stripped
+    /// from the joined path so that the version file path works
+    /// with the git2 library.
+    pub fn get_version_file_path(&self) -> PathBuf {
+        let path = match self.project_type {
+            ProjectType::Node => self.path.join("package.json"),
+            ProjectType::Rust => self.path.join("Cargo.toml"),
+        };
+        path.strip_prefix("./").unwrap_or(&path).to_path_buf()
     }
 }

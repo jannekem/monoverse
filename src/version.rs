@@ -3,11 +3,17 @@ use core::fmt;
 use chrono::Datelike;
 
 /// A version in the format of YY.MM.PATCH
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Version {
     pub major: u32,
     pub minor: u32,
     pub patch: u32,
+}
+
+#[derive(Debug, Clone)]
+pub struct VersionContext {
+    pub version: Version,
+    pub line_number: usize,
 }
 
 impl Version {
@@ -33,7 +39,7 @@ impl Version {
     }
 
     /// Bump version to the next monoversion
-    pub fn bump(self) -> Self {
+    pub fn bump(&self) -> Self {
         let now = chrono::Utc::now();
         let year = now.year() as u32 - 2000;
         let month = now.month();
@@ -57,5 +63,15 @@ impl Version {
 impl fmt::Display for Version {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
+    }
+}
+
+pub trait ToVersion {
+    fn to_version(&self) -> Version;
+}
+
+impl ToVersion for &str {
+    fn to_version(&self) -> Version {
+        Version::parse(self)
     }
 }

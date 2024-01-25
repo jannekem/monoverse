@@ -1,21 +1,36 @@
 use std::path::PathBuf;
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use regex::Regex;
 use serde_json::Value;
 
+use crate::{
+    settings::AppSettings,
+    version::{ToVersion, Version, VersionContext},
+};
+
 pub struct NodeProject {
-    path: PathBuf,
-    repo_path: PathBuf,
+    base: super::BaseProjectFile,
+    package_json_path: PathBuf,
 }
 
 impl NodeProject {
-    pub fn new(path: PathBuf, repo_path: PathBuf) -> Self {
-        Self { path, repo_path }
+    pub fn new(settings: AppSettings, repo_path: PathBuf) -> Self {
+        Self {
+            package_json_path: settings.path.join("package.json"),
+            base: super::BaseProjectFile {
+                settings,
+                repo_path,
+            },
+        }
     }
 }
 
 impl super::ProjectFile for NodeProject {
+    fn base(&self) -> &super::BaseProjectFile {
+        &self.base
+    }
+
     /// Bump version in package.json
     ///
     /// Use serde_json to parse the package.json file and find
@@ -28,22 +43,41 @@ impl super::ProjectFile for NodeProject {
     /// to write the file back. Instead, we use a regular
     /// expression to replace the version field with the new
     /// version and write the string back to the file.
-    fn bump_version(&self) -> Result<()> {
-        let package_json_path = self.repo_path.join(&self.path).join("package.json");
-        let package_json_content = std::fs::read_to_string(&package_json_path)
-            .with_context(|| format!("Could not read file at: {:?}", package_json_path))?;
-        let value: Value = serde_json::from_str(&package_json_content)?;
-        let current_version = value["version"].as_str().ok_or(anyhow::anyhow!(
-            "Failed to parse version from package.json: {:?}",
-            package_json_path
-        ))?;
-        let new_version = crate::version::Version::parse(&current_version).bump();
+    fn bump_version(&self, version_file_content: &str, current_version: Version) -> Result<String> {
         let pattern = Regex::new(&format!(r#""version"\s*:\s*"{}""#, current_version))?;
         let new_package_json = pattern.replace(
-            &package_json_content,
-            format!(r#""version": "{}""#, new_version),
+            &version_file_content,
+            format!(r#""version": "{}""#, current_version.bump()),
         );
-        std::fs::write(&package_json_path, new_package_json.as_bytes())?;
-        Ok(())
+        Ok(new_package_json.into_owned())
+    }
+
+    fn get_current_version_context(
+        &self,
+        version_file_content: &str,
+    ) -> anyhow::Result<VersionContext> {
+        let value: Value = serde_json::from_str(&version_file_content)?;
+        let current_version = value["version"]
+            .as_str()
+            .ok_or(anyhow::anyhow!(
+                "Failed to parse version from package.json: {:?}",
+                self.package_json_path
+            ))?
+            .to_version();
+        let pattern = Regex::new(&format!(r#""version"\s*:\s*"{}""#, current_version))?;
+        let line_number = version_file_content
+            .lines()
+            .enumerate()
+            .find(|(_, line)| pattern.is_match(line))
+            .map(|(line_number, _)| line_number + 1)
+            .ok_or(anyhow::anyhow!(
+                "Failed to find version line number in package.json: {:?}",
+                self.package_json_path
+            ))?;
+        log::info!("Version line number: {}", line_number);
+        Ok(VersionContext {
+            version: current_version,
+            line_number,
+        })
     }
 }
