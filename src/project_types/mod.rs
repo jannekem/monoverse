@@ -10,12 +10,14 @@ use crate::{
     version::{Version, VersionContext},
 };
 
+pub mod helm;
 pub mod node;
 pub mod rust;
 
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "lowercase")]
 pub enum ProjectType {
+    Helm,
     Node,
     Rust,
 }
@@ -33,7 +35,7 @@ pub trait ProjectFile {
     fn get_current_version_context(&self, version_file_content: &str) -> Result<VersionContext>;
 
     fn release(&self, repo: &Repository) -> Result<()> {
-        let version_file_path = self.base().settings.get_version_file_path();
+        let version_file_path = self.base().settings.get_manifest_file_path();
         let version_file_content = self.read_file(&version_file_path)?;
         let version_context = self.get_current_version_context(&version_file_content)?;
 

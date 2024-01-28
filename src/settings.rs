@@ -19,6 +19,7 @@ pub struct AppSettings {
     pub project_type: ProjectType,
     #[serde(default)]
     pub path: PathBuf,
+    pub manifest_path: Option<PathBuf>,
 }
 
 impl Settings {
@@ -38,8 +39,14 @@ impl AppSettings {
     /// If the project path is defined as "." then it is stripped
     /// from the joined path so that the version file path works
     /// with the git2 library.
-    pub fn get_version_file_path(&self) -> PathBuf {
+    ///
+    /// If the manifest path is defined, then it is used instead
+    pub fn get_manifest_file_path(&self) -> PathBuf {
+        if let Some(manifest_path) = &self.manifest_path {
+            return manifest_path.to_path_buf();
+        }
         let path = match self.project_type {
+            ProjectType::Helm => self.path.join("Chart.yaml"),
             ProjectType::Node => self.path.join("package.json"),
             ProjectType::Rust => self.path.join("Cargo.toml"),
         };

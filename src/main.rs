@@ -37,6 +37,13 @@ fn run() -> Result<()> {
                 .ok_or_else(|| anyhow::anyhow!("No project found with name: {}", release.app))?;
             log::info!("App: {:?}", app_settings);
             match app_settings.project_type {
+                ProjectType::Helm => {
+                    let helm_project = project_types::helm::HelmProject::new(
+                        app_settings.clone(),
+                        opts.repo_path.as_ref().unwrap().clone(),
+                    );
+                    helm_project.release(&repo)?;
+                }
                 ProjectType::Node => {
                     let node_project = project_types::node::NodeProject::new(
                         app_settings.clone(),

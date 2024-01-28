@@ -9,13 +9,11 @@ use crate::{
 
 pub struct RustProject {
     base: super::BaseProjectFile,
-    cargo_toml_path: PathBuf,
 }
 
 impl RustProject {
     pub fn new(settings: AppSettings, repo_path: PathBuf) -> Self {
         Self {
-            cargo_toml_path: settings.path.join("Cargo.toml"),
             base: super::BaseProjectFile {
                 settings,
                 repo_path,
@@ -38,7 +36,7 @@ impl super::ProjectFile for RustProject {
             .as_str()
             .ok_or(anyhow::anyhow!(
                 "Failed to parse version from Cargo.toml: {:?}",
-                self.cargo_toml_path
+                self.base.settings.get_manifest_file_path()
             ))?
             .to_version();
         let pattern = regex::Regex::new(&format!(r#"^version\s*=\s*"{}""#, current_version))?;
@@ -49,7 +47,7 @@ impl super::ProjectFile for RustProject {
             .map(|(line_number, _)| line_number + 1)
             .ok_or(anyhow::anyhow!(
                 "Failed to find version in Cargo.toml: {:?}",
-                self.cargo_toml_path
+                self.base.settings.get_manifest_file_path()
             ))?;
         log::info!(
             "Found version {} in Cargo.toml at line {}",
@@ -63,6 +61,8 @@ impl super::ProjectFile for RustProject {
     }
 
     /// Bump version in Cargo.toml
+    ///
+    /// toml_edit preserves the formatting of the original file
     fn bump_version(&self, version_file_content: &str, current_version: Version) -> Result<String> {
         let mut doc = version_file_content.parse::<Document>()?;
         doc["package"]["version"] = value(current_version.bump().to_string());

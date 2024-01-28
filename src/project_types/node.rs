@@ -11,13 +11,11 @@ use crate::{
 
 pub struct NodeProject {
     base: super::BaseProjectFile,
-    package_json_path: PathBuf,
 }
 
 impl NodeProject {
     pub fn new(settings: AppSettings, repo_path: PathBuf) -> Self {
         Self {
-            package_json_path: settings.path.join("package.json"),
             base: super::BaseProjectFile {
                 settings,
                 repo_path,
@@ -52,16 +50,13 @@ impl super::ProjectFile for NodeProject {
         Ok(new_package_json.into_owned())
     }
 
-    fn get_current_version_context(
-        &self,
-        version_file_content: &str,
-    ) -> anyhow::Result<VersionContext> {
+    fn get_current_version_context(&self, version_file_content: &str) -> Result<VersionContext> {
         let value: Value = serde_json::from_str(&version_file_content)?;
         let current_version = value["version"]
             .as_str()
             .ok_or(anyhow::anyhow!(
                 "Failed to parse version from package.json: {:?}",
-                self.package_json_path
+                self.base.settings.get_manifest_file_path()
             ))?
             .to_version();
         let pattern = Regex::new(&format!(r#""version"\s*:\s*"{}""#, current_version))?;
@@ -72,7 +67,7 @@ impl super::ProjectFile for NodeProject {
             .map(|(line_number, _)| line_number + 1)
             .ok_or(anyhow::anyhow!(
                 "Failed to find version line number in package.json: {:?}",
-                self.package_json_path
+                self.base.settings.get_manifest_file_path()
             ))?;
         log::info!("Version line number: {}", line_number);
         Ok(VersionContext {

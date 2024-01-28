@@ -1,6 +1,6 @@
 [package]
 name = "monoverse"
-version = "24.1.1"
+version = "24.1.2"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -15,6 +15,7 @@ log = "0.4.20"
 regex = "1.10.3"
 serde = { version = "1.0.195", features = ["derive"] }
 serde_json = "1.0.111"
+serde_yaml = "0.9.30"
 stderrlog = { version = "0.5.4", default-features = false }
 thiserror = "1.0.56"
 toml_edit = "0.21.0"

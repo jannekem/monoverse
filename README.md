@@ -43,10 +43,11 @@ Applications are defined in the `projects` section of the configuration file.
 
 Each project is represented by a key-value pair, where the key is the name of the project and the value is a map with the following keys:
 
-| Key    | Description              | Allowed values                                                                                             |
-| ------ | ------------------------ | ---------------------------------------------------------------------------------------------------------- |
-| `type` | The type of the project. | `rust`, `node`                                                                                             |
-| `path` | The path to the project. | Any valid directory path relative to the repository root. If omitted, the repository root is used instead. |
+| Key             | Description                                   | Allowed values                                                                                                                |
+| --------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `type`          | The type of the project.                      | `rust`, `node`, `helm`                                                                                                        |
+| `path`          | The path to the project.                      | Any valid directory path relative to the repository root. If omitted, the repository root is used instead.                    |
+| `manifest_path` | The path to the manifest file of the project. | Any valid file path relative to the project root. If omitted, the manifest file is assumed to be located at the project path. |
 
 ### Example YAML configuration
 
@@ -58,6 +59,10 @@ projects:
   client:
     type: node
     path: client
+  nginx:
+    type: helm
+    path: apps/nginx
+    manifest_path: apps/nginx/deployment/Chart.yaml
 ```
 
 ### Example TOML configuration
@@ -70,6 +75,11 @@ path = "server"
 [projects.client]
 type = "node"
 path = "client"
+
+[projects.nginx]
+type = "helm"
+path = "apps/nginx"
+manifest_path = "apps/nginx/deployment/Chart.yaml"
 ```
 
 ## Usage
