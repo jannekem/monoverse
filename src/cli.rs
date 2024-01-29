@@ -17,10 +17,18 @@ pub struct Opts {
 pub enum SubCommand {
     /// Release a project
     Release(Release),
+    /// Print the next version for a project
+    Next(Next),
 }
 
 #[derive(Parser)]
 pub struct Release {
-    /// Application name
-    pub app: String,
+    /// Project name
+    pub project: String,
+}
+
+#[derive(Parser)]
+pub struct Next {
+    /// Project name
+    pub project: String,
 }

@@ -1,3 +1,3 @@
 projects:
-  default:
+  monoverse:
     type: rust

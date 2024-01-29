@@ -4,7 +4,7 @@ use serde_yaml::Value;
 use std::path::PathBuf;
 
 use crate::{
-    settings::AppSettings,
+    settings::ProjectSettings,
     version::{ToVersion, VersionContext},
 };
 
@@ -13,7 +13,7 @@ pub struct HelmProject {
 }
 
 impl HelmProject {
-    pub fn new(settings: AppSettings, repo_path: PathBuf) -> Self {
+    pub fn new(settings: ProjectSettings, repo_path: PathBuf) -> Self {
         Self {
             base: super::BaseProjectFile {
                 settings,

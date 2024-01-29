@@ -10,11 +10,11 @@ use crate::project_types::ProjectType;
 
 #[derive(Deserialize, Debug)]
 pub struct Settings {
-    pub projects: HashMap<String, AppSettings>,
+    pub projects: HashMap<String, ProjectSettings>,
 }
 
 #[derive(Deserialize, Debug, Clone)]
-pub struct AppSettings {
+pub struct ProjectSettings {
     #[serde(rename = "type")]
     pub project_type: ProjectType,
     #[serde(default)]
@@ -31,9 +31,15 @@ impl Settings {
         let deserialized: Self = settings.try_deserialize()?;
         Ok(deserialized)
     }
+
+    pub fn project_settings(&self, project_name: &str) -> Result<&ProjectSettings> {
+        self.projects
+            .get(project_name)
+            .ok_or_else(|| anyhow::anyhow!("No project found with name: {}", project_name))
+    }
 }
 
-impl AppSettings {
+impl ProjectSettings {
     /// Return the path to the version file for each project type
     ///
     /// If the project path is defined as "." then it is stripped

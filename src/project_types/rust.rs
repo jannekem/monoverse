@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use toml_edit::{value, Document};
 
 use crate::{
-    settings::AppSettings,
+    settings::ProjectSettings,
     version::{ToVersion, Version},
 };
 
@@ -12,7 +12,7 @@ pub struct RustProject {
 }
 
 impl RustProject {
-    pub fn new(settings: AppSettings, repo_path: PathBuf) -> Self {
+    pub fn new(settings: ProjectSettings, repo_path: PathBuf) -> Self {
         Self {
             base: super::BaseProjectFile {
                 settings,

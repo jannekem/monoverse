@@ -8,6 +8,7 @@
   - [Example TOML configuration](#example-toml-configuration)
 - [Usage](#usage)
 
+_This project is still in its early stages and as such it is not yet ready for production use._
 
 ## Introduction
 
