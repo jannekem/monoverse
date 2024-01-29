@@ -12,7 +12,7 @@ _This project is still in its early stages and as such it is not yet ready for p
 
 ## Introduction
 
-Monoverse is a tool for managing application version numbering using the [CalVer](https://calver.org/) versioning scheme. It is designed to be used with monorepos, but it can also be used with single projects as witnessed by the `monoverse` project itself.
+Monoverse is a tool for managing application version numbering using the [CalVer](https://calver.org/) versioning scheme. It is designed to be used with monorepos, but it can also be used with single projects.
 
 The reality for many projects is that they don't actually need to follow [semantic versioning](https://semver.org/). For example, if you are building a web application with lots of microservices, you're generally not going to be publishing them as libraries. Instead, they'll be deployed as individual APIs that each have their own lifecycle.
 

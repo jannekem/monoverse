@@ -1,6 +1,6 @@
 [package]
 name = "monoverse"
-version = "24.1.2"
+version = "0.1.0"
 edition = "2021"
 authors = ["Janne Kemppainen"]
 description = "A CLI tool for managing version numbers in monorepos."
