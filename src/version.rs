@@ -13,6 +13,7 @@ pub struct Version {
 #[derive(Debug, Clone)]
 pub struct VersionContext {
     pub version: Version,
+    pub next_version: Version,
     pub line_number: usize,
 }
 
@@ -65,6 +66,17 @@ impl Version {
             major: self.major,
             minor: self.minor,
             patch: self.patch + 1,
+        }
+    }
+}
+
+impl VersionContext {
+    pub fn new(version: Version, line_number: usize) -> Self {
+        let next_version = version.bump();
+        Self {
+            version,
+            next_version,
+            line_number,
         }
     }
 }

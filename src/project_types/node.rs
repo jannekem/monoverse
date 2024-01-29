@@ -6,7 +6,7 @@ use serde_json::Value;
 
 use crate::{
     settings::ProjectSettings,
-    version::{ToVersion, Version, VersionContext},
+    version::{ToVersion, VersionContext},
 };
 
 pub struct NodeProject {
@@ -41,25 +41,29 @@ impl super::ProjectFile for NodeProject {
     /// to write the file back. Instead, we use a regular
     /// expression to replace the version field with the new
     /// version and write the string back to the file.
-    fn bump_version(&self, version_file_content: &str, current_version: Version) -> Result<String> {
-        let pattern = Regex::new(&format!(r#""version"\s*:\s*"{}""#, current_version))?;
+    fn update_version(
+        &self,
+        version_file_content: &str,
+        version_context: VersionContext,
+    ) -> Result<String> {
+        let pattern = Regex::new(&format!(r#""version"\s*:\s*"{}""#, version_context.version))?;
         let new_package_json = pattern.replace(
             &version_file_content,
-            format!(r#""version": "{}""#, current_version.bump()),
+            format!(r#""version": "{}""#, version_context.next_version),
         );
         Ok(new_package_json.into_owned())
     }
 
-    fn get_current_version_context(&self, version_file_content: &str) -> Result<VersionContext> {
+    fn version_context(&self, version_file_content: &str) -> Result<VersionContext> {
         let value: Value = serde_json::from_str(&version_file_content)?;
-        let current_version = value["version"]
+        let version = value["version"]
             .as_str()
             .ok_or(anyhow::anyhow!(
                 "Failed to parse version from package.json: {:?}",
                 self.base.settings.get_manifest_file_path()
             ))?
             .to_version();
-        let pattern = Regex::new(&format!(r#""version"\s*:\s*"{}""#, current_version))?;
+        let pattern = Regex::new(&format!(r#""version"\s*:\s*"{}""#, version))?;
         let line_number = version_file_content
             .lines()
             .enumerate()
@@ -70,9 +74,6 @@ impl super::ProjectFile for NodeProject {
                 self.base.settings.get_manifest_file_path()
             ))?;
         log::info!("Version line number: {}", line_number);
-        Ok(VersionContext {
-            version: current_version,
-            line_number,
-        })
+        Ok(VersionContext::new(version, line_number))
     }
 }

@@ -28,7 +28,7 @@ impl super::ProjectFile for HelmProject {
         &self.base
     }
 
-    fn get_current_version_context(&self, version_file_content: &str) -> Result<VersionContext> {
+    fn version_context(&self, version_file_content: &str) -> Result<VersionContext> {
         let value: Value = serde_yaml::from_str(version_file_content)?;
         let version = value["appVersion"]
             .as_str()
@@ -52,16 +52,13 @@ impl super::ProjectFile for HelmProject {
             version,
             line_number
         );
-        Ok(VersionContext {
-            version,
-            line_number,
-        })
+        Ok(VersionContext::new(version, line_number))
     }
 
-    fn bump_version(
+    fn update_version(
         &self,
         version_file_content: &str,
-        current_version: crate::version::Version,
+        version_context: VersionContext,
     ) -> Result<String> {
         let value: Value = serde_yaml::from_str(version_file_content)?;
         let chart_version = value["version"]
@@ -71,17 +68,19 @@ impl super::ProjectFile for HelmProject {
                 self.base.settings.get_manifest_file_path()
             ))?
             .to_version();
-        let app_version_pattern =
-            RegexBuilder::new(&format!(r#"^appVersion:\s*"?{}"?"#, current_version))
-                .multi_line(true)
-                .build()?;
+        let app_version_pattern = RegexBuilder::new(&format!(
+            r#"^appVersion:\s*"?{}"?"#,
+            version_context.version
+        ))
+        .multi_line(true)
+        .build()?;
         let chart_version_pattern =
             RegexBuilder::new(&format!(r#"^version:\s*"?{}"?"#, chart_version))
                 .multi_line(true)
                 .build()?;
         let result = app_version_pattern.replace(
             &version_file_content,
-            format!(r#"appVersion: "{}""#, current_version.bump()),
+            format!(r#"appVersion: "{}""#, version_context.next_version),
         );
         let result = chart_version_pattern.replace(
             &result,

@@ -17,8 +17,8 @@ pub struct Settings {
 pub struct ProjectSettings {
     #[serde(rename = "type")]
     pub project_type: ProjectType,
-    #[serde(default)]
-    pub path: PathBuf,
+    #[serde(default, rename = "path")]
+    pub project_path: PathBuf,
     pub manifest_path: Option<PathBuf>,
 }
 
@@ -52,9 +52,9 @@ impl ProjectSettings {
             return manifest_path.to_path_buf();
         }
         let path = match self.project_type {
-            ProjectType::Helm => self.path.join("Chart.yaml"),
-            ProjectType::Node => self.path.join("package.json"),
-            ProjectType::Rust => self.path.join("Cargo.toml"),
+            ProjectType::Helm => self.project_path.join("Chart.yaml"),
+            ProjectType::Node => self.project_path.join("package.json"),
+            ProjectType::Rust => self.project_path.join("Cargo.toml"),
         };
         path.strip_prefix("./").unwrap_or(&path).to_path_buf()
     }

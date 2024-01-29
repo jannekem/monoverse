@@ -4,11 +4,7 @@ use anyhow::{Context, Result};
 use git2::Repository;
 use serde::Deserialize;
 
-use crate::{
-    git,
-    settings::ProjectSettings,
-    version::{Version, VersionContext},
-};
+use crate::{git, settings::ProjectSettings, version::VersionContext};
 
 pub mod helm;
 pub mod node;
@@ -37,26 +33,29 @@ pub fn get_project_file(settings: ProjectSettings, repo_path: PathBuf) -> Box<dy
 
 pub trait ProjectFile {
     fn base(&self) -> &BaseProjectFile;
-    fn bump_version(&self, version_file_content: &str, current_version: Version) -> Result<String>;
+    fn update_version(
+        &self,
+        version_file_content: &str,
+        version_context: VersionContext,
+    ) -> Result<String>;
 
     /// Return the current version and the line number of the version field
-    fn get_current_version_context(&self, version_file_content: &str) -> Result<VersionContext>;
+    fn version_context(&self, version_file_content: &str) -> Result<VersionContext>;
 
     fn release(&self, repo: &Repository) -> Result<()> {
         let version_file_path = self.base().settings.get_manifest_file_path();
         let version_file_content = read_file(&version_file_path, &self.base().repo_path)?;
-        let version_context = self.get_current_version_context(&version_file_content)?;
+        let version_context = self.version_context(&version_file_content)?;
 
         let commit_id =
             git::get_commit_id_for_line(&repo, &version_file_path, version_context.line_number)?;
         log::info!("Commit ID: {}", commit_id);
         let has_changed =
-            git::has_path_changed_since(&repo, &self.base().settings.path, commit_id)?;
+            git::has_path_changed_since(&repo, &self.base().settings.project_path, commit_id)?;
         log::info!("Has changed: {}", has_changed);
         if has_changed {
             log::info!("There are changes to the project.");
-            let new_version_file =
-                self.bump_version(&version_file_content, version_context.version)?;
+            let new_version_file = self.update_version(&version_file_content, version_context)?;
             write_file(
                 &version_file_path,
                 &self.base().repo_path,
@@ -69,7 +68,7 @@ pub trait ProjectFile {
     fn print_next_version(&self) -> Result<()> {
         let version_file_path = self.base().settings.get_manifest_file_path();
         let version_file_content = read_file(&version_file_path, &self.base().repo_path)?;
-        let version_context = self.get_current_version_context(&version_file_content)?;
+        let version_context = self.version_context(&version_file_content)?;
         println!("{}", version_context.version.bump());
         Ok(())
     }
