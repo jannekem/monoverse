@@ -2,6 +2,13 @@
 name = "monoverse"
 version = "24.1.2"
 edition = "2021"
+authors = ["Janne Kemppainen"]
+description = "A CLI tool for managing version numbers in monorepos."
+license = "Apache-2.0"
+repository = "https://github.com/jannekem/monoverse"
+readme = "README.md"
+keywords = ["version", "monorepo", "cli"]
+categories = ["development-tools"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
