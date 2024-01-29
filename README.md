@@ -26,13 +26,19 @@ CalVer is a simple versioning scheme that is based on the calendar. The `monover
 
 Monoverse is written in [Rust](https://www.rust-lang.org/) and as such it currently requires the Rust toolchain to be installed. The easiest way to install Rust is by using [rustup](https://rustup.rs/).
 
-Once Rust is installed and you have cloned the repository, you can install monoverse by running the following command from the root of the repository:
+Once you have Rust installed, you can install the latest published release of `monoverse` by running the following command:
+
+```bash
+cargo install monoverse
+```
+
+This will build the `monoverse` binary and install it in your `~/.cargo/bin` directory, after which it can be used from anywhere.
+
+You can also clone the repository and build the binary yourself with the following command:
 
 ```bash
 cargo install --path .
 ```
-
-This will build the `monoverse` binary and install it in your `~/.cargo/bin` directory, after which it can be used from anywhere.
 
 ## Configuration
 
