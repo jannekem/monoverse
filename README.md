@@ -7,6 +7,8 @@
   - [Example YAML configuration](#example-yaml-configuration)
   - [Example TOML configuration](#example-toml-configuration)
 - [Usage](#usage)
+  - [Release](#release)
+  - [Next](#next)
 
 _This project is still in its early stages and as such it is not yet ready for production use._
 
@@ -87,7 +89,9 @@ manifest_path = "apps/nginx/deployment/Chart.yaml"
 
 After installing monoverse and creating a configuration file, you can use it to manage the version numbers of your projects.
 
-You can create a new version by running the following command:
+### Release
+
+You can create a new version by running `monoverse release` command
 
 ```bash
 monoverse release <project>
@@ -96,3 +100,13 @@ monoverse release <project>
 where `<project>` is the key of the project as defined in the configuration file.
 
 Monoverse will then check if the project has been modified since the last release. If there are changes, it will craft a new version number and update the project's manifest file depending on its type.
+
+### Next
+
+You can also get the next version number without actually updating the project's manifest file by running the `monoverse next` command
+
+```bash
+monoverse next <project>
+```
+
+where `<project>` is the key of the project as defined in the configuration file. The program will then print the next version number to the standard output if a new release is required.
