@@ -63,7 +63,7 @@ impl super::ProjectFile for RustProject {
     fn update_version(
         &self,
         version_file_content: &str,
-        version_context: VersionContext,
+        version_context: &VersionContext,
     ) -> Result<String> {
         let mut doc = version_file_content.parse::<Document>()?;
         doc["package"]["version"] = value(version_context.next_version.to_string());

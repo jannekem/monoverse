@@ -4,7 +4,11 @@ use anyhow::Result;
 use git2::Repository;
 use serde::Deserialize;
 
-use crate::{git, settings::ProjectSettings, version::VersionContext};
+use crate::{
+    git,
+    settings::ProjectSettings,
+    version::{Version, VersionContext},
+};
 
 pub mod helm;
 pub mod node;
@@ -36,13 +40,19 @@ pub trait ProjectFile {
     fn update_version(
         &self,
         version_file_content: &str,
-        version_context: VersionContext,
+        version_context: &VersionContext,
     ) -> Result<String>;
 
     /// Return the current version and the line number of the version field
     fn version_context(&self, version_file_content: &str) -> Result<VersionContext>;
 
-    fn release(&self, repo: &Repository) -> Result<()> {
+    /// Release project
+    ///
+    /// If the project has changed since the last release, update the version
+    /// and write it to the manifest file. Return the new version.
+    ///
+    /// If the project has not changed since the last release, return None.
+    fn release(&self, repo: &Repository) -> Result<Option<Version>> {
         let version_file_path = self.base().settings.get_manifest_file_path();
         let version_file_content =
             crate::io::read_file(&version_file_path, &self.base().repo_path)?;
@@ -54,16 +64,23 @@ pub trait ProjectFile {
         let has_changed =
             git::has_path_changed_since(&repo, &self.base().settings.project_path, commit_id)?;
         log::info!("Has changed: {}", has_changed);
-        if has_changed {
-            log::info!("There are changes to the project.");
-            let new_version_file = self.update_version(&version_file_content, version_context)?;
-            crate::io::write_file(
-                &version_file_path,
-                &self.base().repo_path,
-                new_version_file.as_str(),
-            )?;
+        match has_changed {
+            true => {
+                log::info!("There are changes to the project.");
+                let new_version_file =
+                    self.update_version(&version_file_content, &version_context)?;
+                crate::io::write_file(
+                    &version_file_path,
+                    &self.base().repo_path,
+                    new_version_file.as_str(),
+                )?;
+                Ok(Some(version_context.next_version))
+            }
+            false => {
+                log::info!("There are no changes to the project.");
+                Ok(None)
+            }
         }
-        Ok(())
     }
 
     fn print_next_version(&self) -> Result<()> {

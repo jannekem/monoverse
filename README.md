@@ -7,6 +7,7 @@
 - [Installation](#installation)
 - [Configuration](#configuration)
   - [Projects](#projects)
+  - [Project dependents](#project-dependents)
   - [Example YAML configuration](#example-yaml-configuration)
   - [Example TOML configuration](#example-toml-configuration)
 - [Usage](#usage)
@@ -55,11 +56,32 @@ Applications are defined in the `projects` section of the configuration file.
 
 Each project is represented by a key-value pair, where the key is the name of the project and the value is a map with the following keys:
 
-| Key             | Description                                   | Allowed values                                                                                                                |
-| --------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `type`          | The type of the project.                      | `rust`, `node`, `helm`                                                                                                        |
-| `path`          | The path to the project.                      | Any valid directory path relative to the repository root. If omitted, the repository root is used instead.                    |
-| `manifest_path` | The path to the manifest file of the project. | Any valid file path relative to the project root. If omitted, the manifest file is assumed to be located at the project path. |
+| Key             | Description                                   | Allowed values                                                                                                                                                   |
+| --------------- | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type`          | The type of the project.                      | `rust`, `node`, `helm`                                                                                                                                           |
+| `path`          | The path to the project.                      | Any valid directory path relative to the repository root. If omitted, the repository root is used instead.                                                       |
+| `manifest_path` | The path to the manifest file of the project. | Any valid file path relative to the project root. If omitted, the manifest file is assumed to be located at the project path.                                    |
+| `dependents`    | The dependents of the project.                | A list of dependent files which should be updated when the project is released. For more information, see the [Project dependents](#project-dependents) section. |
+
+### Project dependents
+
+Projects can also have dependents. This is useful when you have a project that is used by other projects or files in the repository.
+
+When a project is released, its dependents will be updated with the new version number. Dependents are defined in the `dependents` section of the project configuration.
+
+Dependent settings can contain the following keys:
+
+| Key        | Description                                                | Allowed values                                                                                                              |
+| ---------- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `type`     | The type of the dependent.                                 | `toml`                                                                                                                      |
+| `path`     | The path to the dependent file.                            | Any valid file path relative to the project root.                                                                           |
+| `selector` | The selector for the version number in the dependent file. | A selector for the version number in the dependent file. The format of the selector depends on the `type` of the dependent. |
+
+Selector formats for different dependent types:
+
+| Dependent type | Selector format                                                                                       |
+| -------------- | ----------------------------------------------------------------------------------------------------- |
+| `toml`         | Dot-separated path to the version number in the TOML file. For example: `dependencies.server.version` |
 
 ### Example YAML configuration
 
@@ -68,6 +90,10 @@ projects:
   server:
     type: rust
     path: server
+    dependents:
+      - type: toml
+        path: dependency.toml
+        selector: dependencies.server.version
   client:
     type: node
     path: client
@@ -83,6 +109,11 @@ projects:
 [projects.server]
 type = "rust"
 path = "server"
+
+[[projects.server.dependents]]
+type = "toml"
+path = "dependency.toml"
+selector = "dependencies.server.version"
 
 [projects.client]
 type = "node"
