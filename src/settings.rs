@@ -6,7 +6,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::project_types::ProjectType;
+use crate::projects::ProjectType;
 
 #[derive(Deserialize, Debug)]
 pub struct Settings {

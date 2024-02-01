@@ -3,7 +3,8 @@ use clap::Parser;
 
 mod cli;
 mod git;
-mod project_types;
+mod io;
+mod projects;
 mod settings;
 mod version;
 
@@ -31,13 +32,13 @@ fn run() -> Result<()> {
         cli::SubCommand::Release(release) => {
             let project_settings = settings.project_settings(&release.project)?;
             let project_file =
-                project_types::get_project_file(project_settings.clone(), opts.repo_path.unwrap());
+                projects::get_project_file(project_settings.clone(), opts.repo_path.unwrap());
             project_file.release(&repo)?;
         }
         cli::SubCommand::Next(next) => {
             let project_settings = settings.project_settings(&next.project)?;
             let project_file =
-                project_types::get_project_file(project_settings.clone(), opts.repo_path.unwrap());
+                projects::get_project_file(project_settings.clone(), opts.repo_path.unwrap());
             project_file.print_next_version()?;
         }
     }

@@ -1,6 +1,6 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use git2::Repository;
 use serde::Deserialize;
 
@@ -44,7 +44,8 @@ pub trait ProjectFile {
 
     fn release(&self, repo: &Repository) -> Result<()> {
         let version_file_path = self.base().settings.get_manifest_file_path();
-        let version_file_content = read_file(&version_file_path, &self.base().repo_path)?;
+        let version_file_content =
+            crate::io::read_file(&version_file_path, &self.base().repo_path)?;
         let version_context = self.version_context(&version_file_content)?;
 
         let commit_id =
@@ -56,7 +57,7 @@ pub trait ProjectFile {
         if has_changed {
             log::info!("There are changes to the project.");
             let new_version_file = self.update_version(&version_file_content, version_context)?;
-            write_file(
+            crate::io::write_file(
                 &version_file_path,
                 &self.base().repo_path,
                 new_version_file.as_str(),
@@ -67,22 +68,10 @@ pub trait ProjectFile {
 
     fn print_next_version(&self) -> Result<()> {
         let version_file_path = self.base().settings.get_manifest_file_path();
-        let version_file_content = read_file(&version_file_path, &self.base().repo_path)?;
+        let version_file_content =
+            crate::io::read_file(&version_file_path, &self.base().repo_path)?;
         let version_context = self.version_context(&version_file_content)?;
         println!("{}", version_context.version.bump());
         Ok(())
     }
-}
-
-fn read_file<P: AsRef<Path>>(path: P, repo_path: P) -> Result<String> {
-    let path = repo_path.as_ref().join(path.as_ref());
-    let version_file_content = std::fs::read_to_string(&path)
-        .with_context(|| format!("Could not read file at: {:}", path.display()))?;
-    Ok(version_file_content)
-}
-
-fn write_file<P: AsRef<Path>>(path: P, repo_path: P, content: &str) -> Result<()> {
-    let path = repo_path.as_ref().join(path.as_ref());
-    std::fs::write(&path, content)?;
-    Ok(())
 }
