@@ -1,4 +1,7 @@
 # monoverse
+[![Crates.io Version](https://img.shields.io/crates/v/monoverse.svg)](https://crates.io/crates/monoverse)
+![Crates.io Total Downloads](https://img.shields.io/crates/d/monoverse)
+[![GitHub License](https://img.shields.io/crates/l/monoverse.svg)](https://github.com/jannekem/monoverse/blob/main/LICENSE)
 
 - [Introduction](#introduction)
 - [Installation](#installation)
