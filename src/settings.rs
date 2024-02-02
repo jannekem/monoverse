@@ -30,6 +30,7 @@ pub struct DependentSettings {
     #[serde(default, rename = "path")]
     pub dependent_path: PathBuf,
     pub selector: Option<String>,
+    pub replace: Option<String>,
 }
 
 impl Settings {
