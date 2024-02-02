@@ -2,6 +2,7 @@ use anyhow::Result;
 use clap::Parser;
 
 mod cli;
+mod dependents;
 mod git;
 mod io;
 mod projects;
@@ -31,9 +32,24 @@ fn run() -> Result<()> {
     match opts.subcmd {
         cli::SubCommand::Release(release) => {
             let project_settings = settings.project_settings(&release.project)?;
-            let project_file =
-                projects::get_project_file(project_settings.clone(), opts.repo_path.unwrap());
-            project_file.release(&repo)?;
+            let project_file = projects::get_project_file(
+                project_settings.clone(),
+                opts.repo_path.clone().unwrap(),
+            );
+            let dependents = project_settings
+                .dependents
+                .iter()
+                .flatten()
+                .map(|dependent| {
+                    dependents::get_dependent(&dependent, opts.repo_path.clone().unwrap())
+                })
+                .collect::<Result<Vec<_>>>()?;
+
+            if let Some(version) = project_file.release(&repo)? {
+                for dependent in dependents {
+                    dependent.update_version(&version)?;
+                }
+            }
         }
         cli::SubCommand::Next(next) => {
             let project_settings = settings.project_settings(&next.project)?;

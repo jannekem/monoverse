@@ -44,7 +44,7 @@ impl super::ProjectFile for NodeProject {
     fn update_version(
         &self,
         version_file_content: &str,
-        version_context: VersionContext,
+        version_context: &VersionContext,
     ) -> Result<String> {
         let pattern = Regex::new(&format!(r#""version"\s*:\s*"{}""#, version_context.version))?;
         let new_package_json = pattern.replace(

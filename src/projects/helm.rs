@@ -58,7 +58,7 @@ impl super::ProjectFile for HelmProject {
     fn update_version(
         &self,
         version_file_content: &str,
-        version_context: VersionContext,
+        version_context: &VersionContext,
     ) -> Result<String> {
         let value: Value = serde_yaml::from_str(version_file_content)?;
         let chart_version = value["version"]

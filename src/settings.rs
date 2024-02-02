@@ -6,7 +6,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::projects::ProjectType;
+use crate::{dependents::DependentType, projects::ProjectType};
 
 #[derive(Deserialize, Debug)]
 pub struct Settings {
@@ -20,6 +20,16 @@ pub struct ProjectSettings {
     #[serde(default, rename = "path")]
     pub project_path: PathBuf,
     pub manifest_path: Option<PathBuf>,
+    pub dependents: Option<Vec<DependentSettings>>,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+pub struct DependentSettings {
+    #[serde(rename = "type")]
+    pub dependent_type: DependentType,
+    #[serde(default, rename = "path")]
+    pub dependent_path: PathBuf,
+    pub selector: Option<String>,
 }
 
 impl Settings {
