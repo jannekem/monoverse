@@ -58,10 +58,17 @@ Each project is represented by a key-value pair, where the key is the name of th
 
 | Key             | Description                                   | Allowed values                                                                                                                                                   |
 | --------------- | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `type`          | The type of the project.                      | `rust`, `node`, `helm`                                                                                                                                           |
+| `type`          | The type of the project.                      | `rust`, `node`, `helm`, `toml`                                                                                                                                   |
 | `path`          | The path to the project.                      | Any valid directory path relative to the repository root. If omitted, the repository root is used instead.                                                       |
 | `manifest_path` | The path to the manifest file of the project. | Any valid file path relative to the project root. If omitted, the manifest file is assumed to be located at the project path.                                    |
+| `selector`      | The selector for the version number.          | The format of the selector depends on the `type` of the project.                                                                                                 |
 | `dependents`    | The dependents of the project.                | A list of dependent files which should be updated when the project is released. For more information, see the [Project dependents](#project-dependents) section. |
+
+Selector formats for project types that use the `selector` key:
+
+| Project type | Selector format                                                                           |
+| ------------ | ----------------------------------------------------------------------------------------- |
+| `toml`       | Dot-separated path to the version number in the TOML file. For example: `package.version` |
 
 ### Project dependents
 
@@ -87,10 +94,10 @@ Selector formats for different dependent types:
 
 Replace formats for different dependent types:
 
-| Dependent type | Replace format                                                                                     |
-| -------------- | -------------------------------------------------------------------------------------------------- |
-| `regex`        | A format string that replaces the matching text in the dependent file. For example: `v{{version}}` |
-| `toml`         | N/A                                                                                                |
+| Dependent type | Replace format                                                                                                                         |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `regex`        | A format string that replaces the matching text in the dependent file. Defaults to the new version string. For example: `v{{version}}` |
+| `toml`         | N/A                                                                                                                                    |
 
 The `replace` string can contain the `{{version}}` placeholder, which will be replaced with the new version number when the project is released.
 
@@ -161,6 +168,10 @@ monoverse release <project>
 where `<project>` is the key of the project as defined in the configuration file.
 
 Monoverse will then check if the project has been modified since the last release. If there are changes, it will craft a new version number and update the project's manifest file depending on its type.
+
+If the project has dependents, Monoverse will also update the dependent files with the new version number.
+
+The manifest file must not have any uncommitted changes, or the release will fail.
 
 ### Next
 

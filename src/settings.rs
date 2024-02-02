@@ -20,6 +20,7 @@ pub struct ProjectSettings {
     #[serde(default, rename = "path")]
     pub project_path: PathBuf,
     pub manifest_path: Option<PathBuf>,
+    pub selector: Option<String>,
     pub dependents: Option<Vec<DependentSettings>>,
 }
 
@@ -58,15 +59,16 @@ impl ProjectSettings {
     /// with the git2 library.
     ///
     /// If the manifest path is defined, then it is used instead
-    pub fn get_manifest_file_path(&self) -> PathBuf {
+    pub fn get_manifest_file_path(&self) -> Result<PathBuf> {
         if let Some(manifest_path) = &self.manifest_path {
-            return manifest_path.to_path_buf();
+            return Ok(manifest_path.to_path_buf());
         }
         let path = match self.project_type {
             ProjectType::Helm => self.project_path.join("Chart.yaml"),
             ProjectType::Node => self.project_path.join("package.json"),
             ProjectType::Rust => self.project_path.join("Cargo.toml"),
+            ProjectType::Toml => Err(anyhow::anyhow!("TOML project requires a manifest path"))?,
         };
-        path.strip_prefix("./").unwrap_or(&path).to_path_buf()
+        Ok(path.strip_prefix("./").unwrap_or(&path).to_path_buf())
     }
 }

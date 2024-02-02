@@ -96,3 +96,9 @@ impl ToVersion for &str {
         Version::parse(self)
     }
 }
+
+impl ToVersion for String {
+    fn to_version(&self) -> Version {
+        Version::parse(self)
+    }
+}
