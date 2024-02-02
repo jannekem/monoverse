@@ -1,8 +1,9 @@
-use anyhow::Result;
+use anyhow::{Context, Result};
 use clap::Parser;
 
 mod cli;
 mod dependents;
+mod edit;
 mod git;
 mod io;
 mod projects;
@@ -14,7 +15,10 @@ use git2::Repository;
 
 fn main() {
     if let Err(e) = run() {
-        log::error!("Error: {}", e);
+        log::error!("{}", e);
+        for cause in e.chain().skip(1) {
+            log::error!("{}", cause);
+        }
         std::process::exit(1);
     }
 }
@@ -45,7 +49,10 @@ fn run() -> Result<()> {
                 })
                 .collect::<Result<Vec<_>>>()?;
 
-            if let Some(version) = project_file.release(&repo)? {
+            if let Some(version) = project_file
+                .release(&repo)
+                .with_context(|| format!("Failed to release '{}'", &release.project))?
+            {
                 for dependent in dependents {
                     dependent.update_version(&version)?;
                 }

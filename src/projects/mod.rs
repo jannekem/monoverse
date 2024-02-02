@@ -13,6 +13,7 @@ use crate::{
 pub mod helm;
 pub mod node;
 pub mod rust;
+pub mod toml;
 
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "lowercase")]
@@ -20,6 +21,7 @@ pub enum ProjectType {
     Helm,
     Node,
     Rust,
+    Toml,
 }
 
 pub struct BaseProjectFile {
@@ -32,6 +34,7 @@ pub fn get_project_file(settings: ProjectSettings, repo_path: PathBuf) -> Box<dy
         ProjectType::Helm => Box::new(helm::HelmProject::new(settings, repo_path)),
         ProjectType::Node => Box::new(node::NodeProject::new(settings, repo_path)),
         ProjectType::Rust => Box::new(rust::RustProject::new(settings, repo_path)),
+        ProjectType::Toml => Box::new(toml::TomlProject::new(settings, repo_path)),
     }
 }
 
@@ -53,7 +56,14 @@ pub trait ProjectFile {
     ///
     /// If the project has not changed since the last release, return None.
     fn release(&self, repo: &Repository) -> Result<Option<Version>> {
-        let version_file_path = self.base().settings.get_manifest_file_path();
+        let version_file_path = self.base().settings.get_manifest_file_path()?;
+        let version_file_status = repo.status_file(&version_file_path)?;
+        if version_file_status.is_wt_modified() || version_file_status.is_index_modified() {
+            return Err(anyhow::anyhow!(
+                "The version file '{}' has been modified. Please stash or commit your changes before releasing.",
+                version_file_path.display()
+            ));
+        }
         let version_file_content =
             crate::io::read_file(&version_file_path, &self.base().repo_path)?;
         let version_context = self.version_context(&version_file_content)?;
@@ -84,7 +94,7 @@ pub trait ProjectFile {
     }
 
     fn print_next_version(&self) -> Result<()> {
-        let version_file_path = self.base().settings.get_manifest_file_path();
+        let version_file_path = self.base().settings.get_manifest_file_path()?;
         let version_file_content =
             crate::io::read_file(&version_file_path, &self.base().repo_path)?;
         let version_context = self.version_context(&version_file_content)?;
