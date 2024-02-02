@@ -73,15 +73,26 @@ Dependent settings can contain the following keys:
 
 | Key        | Description                                                | Allowed values                                                                                                              |
 | ---------- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `type`     | The type of the dependent.                                 | `toml`                                                                                                                      |
+| `type`     | The type of the dependent.                                 | `regex`, `toml`                                                                                                             |
 | `path`     | The path to the dependent file.                            | Any valid file path relative to the project root.                                                                           |
 | `selector` | The selector for the version number in the dependent file. | A selector for the version number in the dependent file. The format of the selector depends on the `type` of the dependent. |
+| `replace`  | String to replace the selector match with.                 | A format string to replace the selector match with. The format of the string depends on the `type` of the dependent.        |
 
 Selector formats for different dependent types:
 
-| Dependent type | Selector format                                                                                       |
-| -------------- | ----------------------------------------------------------------------------------------------------- |
-| `toml`         | Dot-separated path to the version number in the TOML file. For example: `dependencies.server.version` |
+| Dependent type | Selector format                                                                                                                                                                                                 |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `regex`        | A regular expression that matches any text in the dependent file. Note that you will need to escape characters that would otherwise be interpreted by the YAML/TOML parsing. For example: `v\\d+\\.\\d+\\.\\d+` |
+| `toml`         | Dot-separated path to the version number in the TOML file. For example: `dependencies.server.version`                                                                                                           |
+
+Replace formats for different dependent types:
+
+| Dependent type | Replace format                                                                                     |
+| -------------- | -------------------------------------------------------------------------------------------------- |
+| `regex`        | A format string that replaces the matching text in the dependent file. For example: `v{{version}}` |
+| `toml`         | N/A                                                                                                |
+
+The `replace` string can contain the `{{version}}` placeholder, which will be replaced with the new version number when the project is released.
 
 ### Example YAML configuration
 
@@ -91,6 +102,10 @@ projects:
     type: rust
     path: server
     dependents:
+      - type: regex
+        path: client/package.json
+        selector: "\"server\": \".?\\d+\\.\\d+\\.\\d+\""
+        replace: '"server": "{{version}}"'
       - type: toml
         path: dependency.toml
         selector: dependencies.server.version
@@ -109,6 +124,12 @@ projects:
 [projects.server]
 type = "rust"
 path = "server"
+
+[[projects.server.dependents]]
+type = "regex"
+path = "client/package.json"
+selector = "\"server\": \".?\\d+\\.\\d+\\.\\d+\""
+replace = '"server": "{{version}}"'
 
 [[projects.server.dependents]]
 type = "toml"
