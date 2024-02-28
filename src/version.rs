@@ -2,8 +2,10 @@ use core::fmt;
 
 use chrono::Datelike;
 
+use crate::edit::LineContext;
+
 /// A version in the format of YY.MM.PATCH
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Version {
     pub major: u32,
     pub minor: u32,
@@ -77,6 +79,16 @@ impl VersionContext {
             version,
             next_version,
             line_number,
+        }
+    }
+
+    pub fn from_line_context(line_context: LineContext) -> Self {
+        let version = line_context.value.to_version();
+        let next_version = version.bump();
+        Self {
+            version,
+            next_version,
+            line_number: line_context.line_number,
         }
     }
 }
