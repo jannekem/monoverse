@@ -56,6 +56,7 @@ fn run() -> Result<()> {
                 for dependent in dependents {
                     dependent.update_version(&version)?;
                 }
+                println!("{}", version);
             }
         }
         cli::SubCommand::Next(next) => {
