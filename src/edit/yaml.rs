@@ -80,7 +80,7 @@ fn get_value_node<'a>(document: &'a mut Document, selector: &str) -> Result<&'a 
             }
         };
         // Find the pair that corresponds to the current key
-        if let Some(pair) = find_node_pair_by_key(&document, &pairs, key) {
+        if let Some(pair) = find_node_pair_by_key(document, pairs, key) {
             current_node = document.get_node(pair.value).unwrap();
         } else {
             return Err(anyhow::anyhow!(
@@ -106,7 +106,7 @@ fn get_value_node<'a>(document: &'a mut Document, selector: &str) -> Result<&'a 
 /// is returned.
 fn find_node_pair_by_key<'a>(
     document: &'a Document,
-    pairs: &'a Vec<NodePair>,
+    pairs: &'a [NodePair],
     key: &str,
 ) -> Option<&'a NodePair> {
     pairs

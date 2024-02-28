@@ -48,14 +48,14 @@ impl super::ProjectFile for NodeProject {
     ) -> Result<String> {
         let pattern = Regex::new(&format!(r#""version"\s*:\s*"{}""#, version_context.version))?;
         let new_package_json = pattern.replace(
-            &version_file_content,
+            version_file_content,
             format!(r#""version": "{}""#, version_context.next_version),
         );
         Ok(new_package_json.into_owned())
     }
 
     fn version_context(&self, version_file_content: &str) -> Result<VersionContext> {
-        let value: Value = serde_json::from_str(&version_file_content)?;
+        let value: Value = serde_json::from_str(version_file_content)?;
         let version = value["version"]
             .as_str()
             .ok_or(anyhow::anyhow!(

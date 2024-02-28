@@ -72,10 +72,10 @@ pub trait ProjectFile {
         let version_context = self.version_context(&version_file_content)?;
 
         let commit_id =
-            git::get_commit_id_for_line(&repo, &version_file_path, version_context.line_number)?;
+            git::get_commit_id_for_line(repo, &version_file_path, version_context.line_number)?;
         log::info!("Commit ID: {}", commit_id);
         let has_changed =
-            git::has_path_changed_since(&repo, &self.base().settings.project_path, commit_id)?;
+            git::has_path_changed_since(repo, &self.base().settings.project_path, commit_id)?;
         log::info!("Has changed: {}", has_changed);
         match has_changed {
             true => {

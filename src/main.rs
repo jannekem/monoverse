@@ -45,7 +45,7 @@ fn run() -> Result<()> {
                 .iter()
                 .flatten()
                 .map(|dependent| {
-                    dependents::get_dependent(&dependent, opts.repo_path.clone().unwrap())
+                    dependents::get_dependent(dependent, opts.repo_path.clone().unwrap())
                 })
                 .collect::<Result<Vec<_>>>()?;
 
