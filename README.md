@@ -58,7 +58,7 @@ Each project is represented by a key-value pair, where the key is the name of th
 
 | Key             | Description                                   | Allowed values                                                                                                                                                   |
 | --------------- | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `type`          | The type of the project.                      | `rust`, `node`, `helm`, `toml`                                                                                                                                   |
+| `type`          | The type of the project.                      | `rust`, `node`, `helm`, `toml`, `yaml`                                                                                                                           |
 | `path`          | The path to the project.                      | Any valid directory path relative to the repository root. If omitted, the repository root is used instead.                                                       |
 | `manifest_path` | The path to the manifest file of the project. | Any valid file path relative to the project root. If omitted, the manifest file is assumed to be located at the project path.                                    |
 | `selector`      | The selector for the version number.          | The format of the selector depends on the `type` of the project.                                                                                                 |
@@ -69,6 +69,8 @@ Selector formats for project types that use the `selector` key:
 | Project type | Selector format                                                                           |
 | ------------ | ----------------------------------------------------------------------------------------- |
 | `toml`       | Dot-separated path to the version number in the TOML file. For example: `package.version` |
+| `yaml`       | Dot-separated path to the version number in the YAML file. For example: `package.version` |
+
 
 ### Project dependents
 
