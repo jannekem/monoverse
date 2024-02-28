@@ -21,7 +21,7 @@ pub fn get_dependent(
     match dependent_settings.dependent_type {
         DependentType::Regex => Ok(Box::new(regex::RegexDependent {
             settings: dependent_settings.clone(),
-            repo_path: repo_path,
+            repo_path,
         })),
         DependentType::Toml => Ok(Box::new(toml::TomlDependent {
             file_path: dependent_settings.dependent_path.clone(),
@@ -29,7 +29,7 @@ pub fn get_dependent(
                 .selector
                 .clone()
                 .ok_or_else(|| anyhow::anyhow!("Selector is required for TOML dependent"))?,
-            repo_path: repo_path,
+            repo_path,
         })),
     }
 }

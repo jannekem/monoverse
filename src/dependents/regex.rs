@@ -40,7 +40,7 @@ fn update_regex(
         .unwrap_or(version.to_string())
         .replace("{{version}}", &format!("{}", version));
     let pattern = RegexBuilder::new(selector).multi_line(true).build()?;
-    let new_file_content = pattern.replace(&file_content, replace.as_str());
+    let new_file_content = pattern.replace(file_content, replace.as_str());
     Ok(new_file_content.into_owned())
 }
 

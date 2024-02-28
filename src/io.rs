@@ -10,6 +10,6 @@ pub fn read_file<P: AsRef<Path>>(path: P, repo_path: P) -> Result<String> {
 
 pub fn write_file<P: AsRef<Path>>(path: P, repo_path: P, content: &str) -> Result<()> {
     let path = repo_path.as_ref().join(path.as_ref());
-    std::fs::write(&path, content)?;
+    std::fs::write(path, content)?;
     Ok(())
 }
