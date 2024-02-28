@@ -1,17 +1,39 @@
 use anyhow::Result;
-use libyaml_safer::{Document, Node, NodeData, NodePair, Parser};
+use libyaml_safer::{Document, Node, NodeData, NodePair, Parser, ScalarStyle};
 
 use super::LineContext;
+
+/// Edit a YAML file for a given selector
+pub fn edit(file_content: &str, selector: &str, new_value: &str) -> Result<String> {
+    log::info!("Editing YAML file for selector: {}", selector);
+    let mut document = load_document(file_content)?;
+    let value_node = get_value_node(&mut document, selector)?;
+    match value_node {
+        Node {
+            data: NodeData::Scalar { style, .. },
+            start_mark,
+            end_mark,
+            ..
+        } => {
+            let before = &file_content[..start_mark.index as usize];
+            let after = &file_content[end_mark.index as usize..];
+            let new_value = match style {
+                ScalarStyle::Plain => new_value.to_string(),
+                ScalarStyle::SingleQuoted => format!("'{}'", new_value),
+                ScalarStyle::DoubleQuoted => format!("\"{}\"", new_value),
+                _ => new_value.to_string(),
+            };
+            Ok(format!("{}{}{}", before, new_value, after))
+        }
+        _ => Err(anyhow::anyhow!("Value is not a scalar")),
+    }
+}
 
 /// Query a YAML file for a value at a given selector
 pub fn query(file_content: &str, selector: &str) -> Result<LineContext> {
     log::info!("Querying YAML file for selector: {}", selector);
-    let mut parser = Parser::new();
-    let mut data = file_content.as_bytes();
-    parser.set_input_string(&mut data);
-    let mut document = Document::load(&mut parser)?;
-    let keys = selector.split('.').collect::<Vec<_>>();
-    let value_node = get_value_node(&mut document, keys)?;
+    let mut document = load_document(file_content)?;
+    let value_node = get_value_node(&mut document, selector)?;
     match value_node {
         Node {
             data: NodeData::Scalar { value, .. },
@@ -25,11 +47,20 @@ pub fn query(file_content: &str, selector: &str) -> Result<LineContext> {
     }
 }
 
+fn load_document(file_content: &str) -> Result<Document> {
+    let mut parser = Parser::new();
+    let mut data = file_content.as_bytes();
+    parser.set_input_string(&mut data);
+    Ok(Document::load(&mut parser)?)
+}
+
 /// Get the value node for a given selector
 ///
 /// This function traverses the YAML document, looking for the node that
 /// corresponds to the given selector.
-fn get_value_node<'a>(document: &'a mut Document, keys: Vec<&str>) -> Result<&'a Node> {
+fn get_value_node<'a>(document: &'a mut Document, selector: &str) -> Result<&'a Node> {
+    // Split the selector into keys
+    let keys = selector.split('.').collect::<Vec<_>>();
     // Start at the root node
     let mut current_node = document
         .get_node(1)
@@ -76,7 +107,7 @@ fn get_value_node<'a>(document: &'a mut Document, keys: Vec<&str>) -> Result<&'a
 fn find_node_pair_by_key<'a>(
     document: &'a Document,
     pairs: &'a Vec<NodePair>,
-    key: &'a str,
+    key: &str,
 ) -> Option<&'a NodePair> {
     pairs
         .iter()
@@ -89,6 +120,44 @@ fn find_node_pair_by_key<'a>(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_edit() {
+        let file_content = r#"appVersion: "1.2.3""#;
+        let selector = "appVersion";
+        let new_value = "1.2.4";
+        let result = edit(file_content, selector, new_value).unwrap();
+        assert_eq!(result, r#"appVersion: "1.2.4""#);
+    }
+
+    #[test]
+    fn test_edit_nested() {
+        let file_content = r#"single_key: "single_value"
+test_key:
+    nested_key: "value"
+dependencies:
+    serde: "1.0""#;
+        let selector = "dependencies.serde";
+        let new_value = "2.0";
+        let result = edit(file_content, selector, new_value).unwrap();
+        assert_eq!(
+            result,
+            r#"single_key: "single_value"
+test_key:
+    nested_key: "value"
+dependencies:
+    serde: "2.0""#
+        );
+    }
+
+    #[test]
+    fn test_edit_comment_preservation() {
+        let file_content = r#"appVersion: "1.2.3" # comment"#;
+        let selector = "appVersion";
+        let new_value = "1.2.4";
+        let result = edit(file_content, selector, new_value).unwrap();
+        assert_eq!(result, r#"appVersion: "1.2.4" # comment"#);
+    }
 
     #[test]
     fn test_query() {
