@@ -6,12 +6,14 @@ use serde::Deserialize;
 
 mod regex;
 mod toml;
+mod yaml;
 
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "lowercase")]
 pub enum DependentType {
     Regex,
     Toml,
+    Yaml,
 }
 
 pub fn get_dependent(
@@ -29,6 +31,14 @@ pub fn get_dependent(
                 .selector
                 .clone()
                 .ok_or_else(|| anyhow::anyhow!("Selector is required for TOML dependent"))?,
+            repo_path,
+        })),
+        DependentType::Yaml => Ok(Box::new(yaml::YamlDepedent {
+            file_path: dependent_settings.dependent_path.clone(),
+            selector: dependent_settings
+                .selector
+                .clone()
+                .ok_or_else(|| anyhow::anyhow!("Selector is required for YAML dependent"))?,
             repo_path,
         })),
     }

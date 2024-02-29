@@ -93,6 +93,7 @@ Selector formats for different dependent types:
 | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `regex`        | A regular expression that matches any text in the dependent file. Note that you will need to escape characters that would otherwise be interpreted by the YAML/TOML parsing. For example: `v\\d+\\.\\d+\\.\\d+` |
 | `toml`         | Dot-separated path to the version number in the TOML file. For example: `dependencies.server.version`                                                                                                           |
+| `yaml`         | Dot-separated path to the version number in the YAML file. For example: `dependencies.server.version`                                                                                                           |
 
 Replace formats for different dependent types:
 
@@ -100,6 +101,7 @@ Replace formats for different dependent types:
 | -------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | `regex`        | A format string that replaces the matching text in the dependent file. Defaults to the new version string. For example: `v{{version}}` |
 | `toml`         | N/A                                                                                                                                    |
+| `yaml`         | N/A                                                                                                                                    |
 
 The `replace` string can contain the `{{version}}` placeholder, which will be replaced with the new version number when the project is released.
 
