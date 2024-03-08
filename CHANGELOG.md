@@ -6,6 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.3](https://github.com/jannekem/monoverse/compare/v0.1.2...v0.1.3) - 2024-03-08
+
+### Added
+- add container support
+- add YAML dependent
+
+### Fixed
+- apply cargo clippy fixes
+
+### Other
+- use PAT to allow triggering Docker build
+- check clippy
+
 ## [0.1.2](https://github.com/jannekem/monoverse/compare/v0.1.1...v0.1.2) - 2024-02-28
 
 ### Added
