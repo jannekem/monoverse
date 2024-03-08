@@ -13,6 +13,7 @@
 - [Usage](#usage)
   - [Release](#release)
   - [Next](#next)
+- [Docker](#docker)
 
 _This project is still in its early stages and as such it is not yet ready for production use._
 
@@ -186,3 +187,17 @@ monoverse next <project>
 ```
 
 where `<project>` is the key of the project as defined in the configuration file. The program will then print the next version number to the standard output if a new release is required.
+
+## Docker
+
+Monoverse can also be used as a Docker container. The image is available on GitHub Container Registry.
+
+```bash
+docker pull ghcr.io/jannekem/monoverse:latest
+```
+
+You can run the container against a local repository by mounting it as a volume to the `/repo` directory in the container. Add the appropriate arguments to the `monoverse` command to run the desired subcommand. For example:
+
+```bash
+docker run --rm -v /path/to/repository:/repo ghcr.io/jannekem/monoverse:latest release <project-name>
+```
