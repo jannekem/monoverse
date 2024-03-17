@@ -25,6 +25,9 @@ pub enum SubCommand {
 pub struct Release {
     /// Project name
     pub project: String,
+    /// Force release
+    #[clap(long, short)]
+    pub force: bool,
 }
 
 #[derive(Parser)]

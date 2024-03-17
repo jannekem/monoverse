@@ -58,7 +58,7 @@ pub trait ProjectFile {
     /// and write it to the manifest file. Return the new version.
     ///
     /// If the project has not changed since the last release, return None.
-    fn release(&self, repo: &Repository) -> Result<Option<Version>> {
+    fn release(&self, repo: &Repository, force: bool) -> Result<Option<Version>> {
         let version_file_path = self.base().settings.get_manifest_file_path()?;
         let version_file_status = repo.status_file(&version_file_path)?;
         if version_file_status.is_wt_modified() || version_file_status.is_index_modified() {
@@ -71,13 +71,18 @@ pub trait ProjectFile {
             crate::io::read_file(&version_file_path, &self.base().repo_path)?;
         let version_context = self.version_context(&version_file_content)?;
 
-        let commit_id =
-            git::get_commit_id_for_line(repo, &version_file_path, version_context.line_number)?;
-        log::info!("Commit ID: {}", commit_id);
-        let has_changed =
-            git::has_path_changed_since(repo, &self.base().settings.project_path, commit_id)?;
-        log::info!("Has changed: {}", has_changed);
-        match has_changed {
+        let do_release = match force {
+            true => true,
+            false => {
+                let commit_id = git::get_commit_id_for_line(
+                    repo,
+                    &version_file_path,
+                    version_context.line_number,
+                )?;
+                git::has_path_changed_since(repo, &self.base().settings.project_path, commit_id)?
+            }
+        };
+        match do_release {
             true => {
                 log::info!("There are changes to the project.");
                 let new_version_file =

@@ -48,9 +48,8 @@ fn run() -> Result<()> {
                     dependents::get_dependent(dependent, opts.repo_path.clone().unwrap())
                 })
                 .collect::<Result<Vec<_>>>()?;
-
             if let Some(version) = project_file
-                .release(&repo)
+                .release(&repo, release.force)
                 .with_context(|| format!("Failed to release '{}'", &release.project))?
             {
                 for dependent in dependents {
