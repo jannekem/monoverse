@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.4](https://github.com/jannekem/monoverse/compare/v0.1.3...v0.1.4) - 2024-03-17
+
+### Added
+- make logging verbosity configurable
+- add --force flag to release command
+
+### Other
+- mention force flag in README
+- add container instructions
+
 ## [0.1.3](https://github.com/jannekem/monoverse/compare/v0.1.2...v0.1.3) - 2024-03-08
 
 ### Added
