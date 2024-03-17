@@ -16,6 +16,7 @@ categories = ["development-tools"]
 anyhow = "1.0.79"
 chrono = "0.4.31"
 clap = { version = "4.4.16", features = ["derive"] }
+clap-verbosity-flag = "2.2.0"
 config = "0.13.4"
 git2 = "0.18.1"
 libyaml-safer = "0.1.1"

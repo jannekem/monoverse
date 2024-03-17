@@ -13,6 +13,7 @@
 - [Usage](#usage)
   - [Release](#release)
   - [Next](#next)
+  - [Set logging verbosity](#set-logging-verbosity)
 - [Docker](#docker)
 
 _This project is still in its early stages and as such it is not yet ready for production use._
@@ -187,6 +188,12 @@ monoverse next <project>
 ```
 
 where `<project>` is the key of the project as defined in the configuration file. The program will then print the next version number to the standard output if a new release is required.
+
+### Set logging verbosity
+
+By default, Monoverse will only print errors and warnings to `stderr`. You can increase the logging verbosity by using the `-v` or `--verbose` flag. This may be useful for debugging purposes.
+
+If you want to suppress warnings and only print errors, you can use the `-q` or `--quiet` flag. You can also use the `-qq` flag to suppress both warnings and errors.
 
 ## Docker
 

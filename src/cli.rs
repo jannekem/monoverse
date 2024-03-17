@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 
 use clap::Parser;
+use clap_verbosity_flag::{Verbosity, WarnLevel};
 
 #[derive(Parser)]
 #[clap(name = env!("CARGO_PKG_NAME"), version = env!("CARGO_PKG_VERSION"))]
@@ -11,6 +12,9 @@ pub struct Opts {
     /// Repository path
     #[clap(long, default_value = ".", global = true)]
     pub repo_path: Option<PathBuf>,
+
+    #[clap(flatten)]
+    pub verbosity: Verbosity<WarnLevel>,
 }
 
 #[derive(Parser)]

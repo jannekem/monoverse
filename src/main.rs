@@ -27,7 +27,7 @@ fn run() -> Result<()> {
     let opts = Opts::parse();
     stderrlog::new()
         .module(module_path!())
-        .verbosity(log::Level::Info)
+        .verbosity(opts.verbosity.log_level_filter())
         .init()
         .unwrap();
     let settings = settings::Settings::new(opts.repo_path.as_ref().unwrap())?;
