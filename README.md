@@ -172,7 +172,7 @@ monoverse release <project>
 
 where `<project>` is the key of the project as defined in the configuration file.
 
-Monoverse will then check if the project has been modified since the last release. If there are changes, it will craft a new version number and update the project's manifest file depending on its type.
+Monoverse will then check if the project has been modified since the last release. If there are changes, it will craft a new version number and update the project's manifest file depending on its type. You can force a release by using the `--force` flag.
 
 If the project has dependents, Monoverse will also update the dependent files with the new version number.
 
