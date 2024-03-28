@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.5](https://github.com/jannekem/monoverse/compare/v0.1.4...v0.1.5) - 2024-03-28
+
+### Added
+- include git in the container image
+
 ## [0.1.4](https://github.com/jannekem/monoverse/compare/v0.1.3...v0.1.4) - 2024-03-17
 
 ### Added
