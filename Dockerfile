@@ -15,7 +15,7 @@ RUN touch -a -m ./src/main.rs
 RUN cargo build --release
 
 FROM debian:bookworm-slim
-RUN apt-get update && apt-get install -y libssl-dev
+RUN apt-get update && apt-get install -y libssl-dev git
 WORKDIR /repo
 COPY --from=builder /usr/src/target/release/monoverse /usr/local/bin/monoverse
 ENTRYPOINT ["monoverse"]
