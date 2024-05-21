@@ -50,7 +50,7 @@ pub fn query(file_content: &str, selector: &str) -> Result<LineContext> {
 fn get_value<'a>(doc: &'a Document, selector: &str) -> Result<&'a Item> {
     let keys = selector.split('.').collect::<Vec<_>>();
     if keys.len() == 1 {
-        Ok(&doc[&keys[0]])
+        Ok(&doc[keys[0]])
     } else {
         let mut item = &doc[keys[0]];
         assert_not_array_of_tables(item)?;
@@ -58,14 +58,14 @@ fn get_value<'a>(doc: &'a Document, selector: &str) -> Result<&'a Item> {
             item = &item[key];
             assert_not_array_of_tables(item)?;
         }
-        Ok(&item[&keys[keys.len() - 1]])
+        Ok(&item[keys[keys.len() - 1]])
     }
 }
 
 fn set_value(doc: &mut Document, selector: &str, new_value: &str) -> Result<()> {
     let keys = selector.split('.').collect::<Vec<_>>();
     if keys.len() == 1 {
-        doc[&keys[0]] = value(new_value);
+        doc[keys[0]] = value(new_value);
     } else {
         let mut item = &mut doc[keys[0]];
         assert_not_array_of_tables(item)?;
@@ -73,7 +73,7 @@ fn set_value(doc: &mut Document, selector: &str, new_value: &str) -> Result<()> 
             item = &mut item[key];
             assert_not_array_of_tables(item)?;
         }
-        item[&keys[keys.len() - 1]] = value(new_value);
+        item[keys[keys.len() - 1]] = value(new_value);
     }
     Ok(())
 }
