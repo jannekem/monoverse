@@ -20,6 +20,7 @@ pub struct ProjectSettings {
     #[serde(default, rename = "path")]
     pub project_path: PathBuf,
     pub manifest_path: Option<PathBuf>,
+    pub tag_prefix: Option<String>,
     pub selector: Option<String>,
     pub dependents: Option<Vec<DependentSettings>>,
 }

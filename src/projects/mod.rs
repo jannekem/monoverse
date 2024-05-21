@@ -59,7 +59,7 @@ pub trait ProjectFile {
     ///
     /// If the project has not changed since the last release, return None.
     fn release(&self, repo: &Repository, force: bool) -> Result<Option<Version>> {
-        let version_file_path = self.base().settings.get_manifest_file_path()?;
+        let version_file_path = self.get_manifest_file_path()?;
         let version_file_status = repo.status_file(&version_file_path)?;
         if version_file_status.is_wt_modified() || version_file_status.is_index_modified() {
             return Err(anyhow::anyhow!(
@@ -101,12 +101,18 @@ pub trait ProjectFile {
         }
     }
 
+    /// Print the next version for the project
     fn print_next_version(&self) -> Result<()> {
-        let version_file_path = self.base().settings.get_manifest_file_path()?;
+        let version_file_path = self.get_manifest_file_path()?;
         let version_file_content =
             crate::io::read_file(&version_file_path, &self.base().repo_path)?;
         let version_context = self.version_context(&version_file_content)?;
         println!("{}", version_context.version.bump());
         Ok(())
+    }
+
+    /// Get the path to the manifest file
+    fn get_manifest_file_path(&self) -> Result<PathBuf> {
+        self.base().settings.get_manifest_file_path()
     }
 }

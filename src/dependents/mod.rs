@@ -38,4 +38,5 @@ pub fn get_dependent(
 
 pub trait Dependent: Debug {
     fn update_version(&self, version: &Version) -> Result<()>;
+    fn get_file_path(&self) -> PathBuf;
 }

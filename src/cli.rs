@@ -32,6 +32,12 @@ pub struct Release {
     /// Force release
     #[clap(long, short)]
     pub force: bool,
+    /// Commit changes
+    #[clap(long)]
+    pub commit: bool,
+    /// Create a tag
+    #[clap(long, requires = "commit")]
+    pub tag: bool,
 }
 
 #[derive(Parser)]
