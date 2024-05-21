@@ -26,19 +26,11 @@ pub fn get_dependent(
             repo_path,
         })),
         DependentType::Toml => Ok(Box::new(toml::TomlDependent {
-            file_path: dependent_settings.dependent_path.clone(),
-            selector: dependent_settings
-                .selector
-                .clone()
-                .ok_or_else(|| anyhow::anyhow!("Selector is required for TOML dependent"))?,
+            settings: dependent_settings.clone(),
             repo_path,
         })),
         DependentType::Yaml => Ok(Box::new(yaml::YamlDepedent {
-            file_path: dependent_settings.dependent_path.clone(),
-            selector: dependent_settings
-                .selector
-                .clone()
-                .ok_or_else(|| anyhow::anyhow!("Selector is required for YAML dependent"))?,
+            settings: dependent_settings.clone(),
             repo_path,
         })),
     }
