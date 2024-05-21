@@ -5,6 +5,8 @@
 
 - [Introduction](#introduction)
 - [Installation](#installation)
+  - [Cargo](#cargo)
+  - [Docker](#docker)
 - [Configuration](#configuration)
   - [Projects](#projects)
   - [Project dependents](#project-dependents)
@@ -14,7 +16,6 @@
   - [Release](#release)
   - [Next](#next)
   - [Set logging verbosity](#set-logging-verbosity)
-- [Docker](#docker)
 
 ## Introduction
 
@@ -27,6 +28,8 @@ CalVer is a simple versioning scheme that is based on the calendar. The `monover
 [Ubuntu](https://wiki.ubuntu.com/Releases) is a famous example of a project that uses (a variation of) CalVer. Just remember that it is not a replacement for semantic versioning. If you're building a library, you should probably stick to semantic versioning as going back from CalVer is not easy.
 
 ## Installation
+
+### Cargo
 
 Monoverse is written in [Rust](https://www.rust-lang.org/) and as such it currently requires the Rust toolchain to be installed. The easiest way to install Rust is by using [rustup](https://rustup.rs/).
 
@@ -43,6 +46,22 @@ You can also clone the repository and build the binary yourself with the followi
 ```bash
 cargo install --path .
 ```
+
+### Docker
+
+Monoverse can also be used as a Docker container. The image is available on GitHub Container Registry.
+
+```bash
+docker pull ghcr.io/jannekem/monoverse:latest
+```
+
+You can run the container against a local repository by mounting it as a volume to the `/repo` directory in the container. Add the appropriate arguments to the `monoverse` command to run the desired subcommand. For example:
+
+```bash
+docker run --rm -v /path/to/repository:/repo ghcr.io/jannekem/monoverse:latest release <project-name>
+```
+
+The container includes `git` which makes it possible to run custom scripts that interact with the repository. This makes it easier to integrate `monoverse` into CI/CD pipelines when using tools like Tekton that support running Docker containers as build steps.
 
 ## Configuration
 
@@ -199,17 +218,3 @@ where `<project>` is the key of the project as defined in the configuration file
 By default, Monoverse will only print errors and warnings to `stderr`. You can increase the logging verbosity by using the `-v` or `--verbose` flag. This may be useful for debugging purposes.
 
 If you want to suppress warnings and only print errors, you can use the `-q` or `--quiet` flag. You can also use the `-qq` flag to suppress both warnings and errors.
-
-## Docker
-
-Monoverse can also be used as a Docker container. The image is available on GitHub Container Registry.
-
-```bash
-docker pull ghcr.io/jannekem/monoverse:latest
-```
-
-You can run the container against a local repository by mounting it as a volume to the `/repo` directory in the container. Add the appropriate arguments to the `monoverse` command to run the desired subcommand. For example:
-
-```bash
-docker run --rm -v /path/to/repository:/repo ghcr.io/jannekem/monoverse:latest release <project-name>
-```
