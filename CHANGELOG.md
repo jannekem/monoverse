@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.6](https://github.com/jannekem/monoverse/compare/v0.1.5...v0.1.6) - 2024-05-21
+
+### Added
+- add commit and tag options
+
+### Other
+- unify dependent handling
+- fix clippy warnings
+- organize subcommand handlers in separate functions
+
 ## [0.1.5](https://github.com/jannekem/monoverse/compare/v0.1.4...v0.1.5) - 2024-03-28
 
 ### Added
