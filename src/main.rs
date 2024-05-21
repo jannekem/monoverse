@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use anyhow::{Context, Result};
 use clap::Parser;
 
@@ -32,38 +34,46 @@ fn run() -> Result<()> {
         .unwrap();
     let settings = settings::Settings::new(opts.repo_path.as_ref().unwrap())?;
     log::info!("Settings: {:?}", settings);
-    let repo = Repository::open(opts.repo_path.as_ref().unwrap())?;
     match opts.subcmd {
         cli::SubCommand::Release(release) => {
-            let project_settings = settings.project_settings(&release.project)?;
-            let project_file = projects::get_project_file(
-                project_settings.clone(),
-                opts.repo_path.clone().unwrap(),
-            );
-            let dependents = project_settings
-                .dependents
-                .iter()
-                .flatten()
-                .map(|dependent| {
-                    dependents::get_dependent(dependent, opts.repo_path.clone().unwrap())
-                })
-                .collect::<Result<Vec<_>>>()?;
-            if let Some(version) = project_file
-                .release(&repo, release.force)
-                .with_context(|| format!("Failed to release '{}'", &release.project))?
-            {
-                for dependent in dependents {
-                    dependent.update_version(&version)?;
-                }
-                println!("{}", version);
-            }
+            handle_release(release, settings, opts.repo_path.unwrap())?;
         }
         cli::SubCommand::Next(next) => {
-            let project_settings = settings.project_settings(&next.project)?;
-            let project_file =
-                projects::get_project_file(project_settings.clone(), opts.repo_path.unwrap());
-            project_file.print_next_version()?;
+            handle_next(next, settings, opts.repo_path.unwrap())?;
         }
     }
+    Ok(())
+}
+
+fn handle_release(
+    release: cli::Release,
+    settings: settings::Settings,
+    repo_path: PathBuf,
+) -> Result<()> {
+    let repo = Repository::open(&repo_path)?;
+    let project_settings = settings.project_settings(&release.project)?;
+    let project_file = projects::get_project_file(project_settings.clone(), repo_path.clone());
+    let dependents = project_settings
+        .dependents
+        .iter()
+        .flatten()
+        .map(|dependent| dependents::get_dependent(dependent, repo_path.clone()))
+        .collect::<Result<Vec<_>>>()?;
+    if let Some(version) = project_file
+        .release(&repo, release.force)
+        .with_context(|| format!("Failed to release '{}'", release.project))?
+    {
+        for dependent in dependents {
+            dependent.update_version(&version)?;
+        }
+        println!("{}", version);
+    }
+    Ok(())
+}
+
+fn handle_next(next: cli::Next, settings: settings::Settings, repo_path: PathBuf) -> Result<()> {
+    let project_settings = settings.project_settings(&next.project)?;
+    let project_file = projects::get_project_file(project_settings.clone(), repo_path);
+    project_file.print_next_version()?;
     Ok(())
 }
