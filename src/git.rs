@@ -39,3 +39,28 @@ pub fn get_commit_id_for_line<P: AsRef<Path>>(
         None => Err(anyhow::anyhow!("No commit found for line: {}", line)),
     }
 }
+
+/// Commit changes to a list of files
+pub fn commit_files<P: AsRef<Path>>(repo: &Repository, files: &[P], message: &str) -> Result<Oid> {
+    let mut index = repo.index()?;
+    for file in files {
+        index.add_path(file.as_ref())?;
+    }
+    index.write()?;
+    let tree_id = index.write_tree()?;
+    let tree = repo.find_tree(tree_id)?;
+    let author = repo.signature()?;
+    let head = repo.head()?;
+    let parent = head.peel_to_commit()?;
+    match repo.commit(Some("HEAD"), &author, &author, message, &tree, &[&parent]) {
+        Ok(oid) => Ok(oid),
+        Err(e) => Err(anyhow::anyhow!("Failed to commit: {}", e)),
+    }
+}
+
+/// Tag commit
+pub fn tag_commit(repo: &Repository, commit_id: Oid, tag: &str) -> Result<()> {
+    let commit = repo.find_commit(commit_id)?;
+    repo.tag(tag, commit.as_object(), &repo.signature()?, tag, false)?;
+    Ok(())
+}

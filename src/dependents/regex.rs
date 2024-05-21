@@ -23,6 +23,10 @@ impl Dependent for RegexDependent {
         )?;
         Ok(())
     }
+
+    fn get_file_path(&self) -> PathBuf {
+        self.settings.dependent_path.clone()
+    }
 }
 
 fn update_regex(

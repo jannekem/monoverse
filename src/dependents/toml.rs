@@ -27,4 +27,8 @@ impl Dependent for TomlDependent {
         crate::io::write_file(file_path, repo_path, new_file_content.as_str())?;
         Ok(())
     }
+
+    fn get_file_path(&self) -> PathBuf {
+        self.settings.dependent_path.clone()
+    }
 }

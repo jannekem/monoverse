@@ -63,8 +63,26 @@ fn handle_release(
         .release(&repo, release.force)
         .with_context(|| format!("Failed to release '{}'", release.project))?
     {
+        let mut file_paths = Vec::new();
         for dependent in dependents {
             dependent.update_version(&version)?;
+            file_paths.push(dependent.get_file_path());
+        }
+        if release.commit {
+            file_paths.push(project_file.get_manifest_file_path()?);
+            let commit_id = git::commit_files(
+                &repo,
+                &file_paths,
+                &format!("chore: release {} {}", release.project, version),
+            )?;
+            if release.tag {
+                let tag_prefix = project_settings
+                    .tag_prefix
+                    .clone()
+                    .unwrap_or_else(|| format!("{}-", release.project));
+                let tag = format!("{}{}", tag_prefix, version);
+                git::tag_commit(&repo, commit_id, &tag)?;
+            }
         }
         println!("{}", version);
     }

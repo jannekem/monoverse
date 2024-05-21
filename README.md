@@ -16,8 +16,6 @@
   - [Set logging verbosity](#set-logging-verbosity)
 - [Docker](#docker)
 
-_This project is still in its early stages and as such it is not yet ready for production use._
-
 ## Introduction
 
 Monoverse is a tool for managing application version numbering using the [CalVer](https://calver.org/) versioning scheme. It is designed to be used with monorepos, but it can also be used with single projects.
@@ -58,13 +56,14 @@ Applications are defined in the `projects` section of the configuration file.
 
 Each project is represented by a key-value pair, where the key is the name of the project and the value is a map with the following keys:
 
-| Key             | Description                                   | Allowed values                                                                                                                                                   |
-| --------------- | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `type`          | The type of the project.                      | `rust`, `node`, `helm`, `toml`, `yaml`                                                                                                                           |
-| `path`          | The path to the project.                      | Any valid directory path relative to the repository root. If omitted, the repository root is used instead.                                                       |
-| `manifest_path` | The path to the manifest file of the project. | Any valid file path relative to the project root. If omitted, the manifest file is assumed to be located at the project path.                                    |
-| `selector`      | The selector for the version number.          | The format of the selector depends on the `type` of the project.                                                                                                 |
-| `dependents`    | The dependents of the project.                | A list of dependent files which should be updated when the project is released. For more information, see the [Project dependents](#project-dependents) section. |
+| Key             | Description                                   | Allowed values                                                                                                                                                      |
+| --------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type`          | The type of the project.                      | `rust`, `node`, `helm`, `toml`, `yaml`                                                                                                                              |
+| `path`          | The path to the project.                      | Any valid directory path relative to the repository root. If omitted, the repository root is used instead.                                                          |
+| `manifest_path` | The path to the manifest file of the project. | Any valid file path relative to the project root. If omitted, the manifest file is assumed to be located at the project path.                                       |
+| `tag_prefix`    | Prefix for tag creation.                      | A string that will be prefixed to the version number when creating a new tag. Can be set to an empty string if no prefix is desired. Defaults to `<project-name>-`. |
+| `selector`      | The selector for the version number.          | The format of the selector depends on the `type` of the project.                                                                                                    |
+| `dependents`    | The dependents of the project.                | A list of dependent files which should be updated when the project is released. For more information, see the [Project dependents](#project-dependents) section.    |
 
 Selector formats for project types that use the `selector` key:
 
@@ -178,6 +177,12 @@ Monoverse will then check if the project has been modified since the last releas
 If the project has dependents, Monoverse will also update the dependent files with the new version number.
 
 The manifest file must not have any uncommitted changes, or the release will fail.
+
+The following arguments are also available:
+
+- `-f`, `--force`: Force a release even if the project has no changes.
+- `--commit`: Commit the changes to the repository.
+- `--tag`: Create a new tag in the repository, requires `--commit`. By default, the tag format is `<project>-<version>`. It can be customized by configuring the `tag_prefix` key in the configuration file for each project.
 
 ### Next
 
