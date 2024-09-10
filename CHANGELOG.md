@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.7](https://github.com/jannekem/monoverse/compare/v0.1.6...v0.1.7) - 2024-09-10
+
+### Added
+
+- add versionfile project type
+
+### Other
+
+- add missing dependent type
+
 ## [0.1.6](https://github.com/jannekem/monoverse/compare/v0.1.5...v0.1.6) - 2024-05-21
 
 ### Added
