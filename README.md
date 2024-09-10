@@ -110,7 +110,7 @@ Dependent settings can contain the following keys:
 
 | Key        | Description                                                | Allowed values                                                                                                              |
 | ---------- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `type`     | The type of the dependent.                                 | `regex`, `toml`                                                                                                             |
+| `type`     | The type of the dependent.                                 | `regex`, `toml`, `yaml`                                                                                                     |
 | `path`     | The path to the dependent file.                            | Any valid file path relative to the project root.                                                                           |
 | `selector` | The selector for the version number in the dependent file. | A selector for the version number in the dependent file. The format of the selector depends on the `type` of the dependent. |
 | `replace`  | String to replace the selector match with.                 | A format string to replace the selector match with. The format of the string depends on the `type` of the dependent.        |
