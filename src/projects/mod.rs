@@ -14,6 +14,7 @@ pub mod helm;
 pub mod node;
 pub mod rust;
 pub mod toml;
+pub mod versionfile;
 pub mod yaml;
 
 #[derive(Deserialize, Debug, Clone)]
@@ -23,6 +24,7 @@ pub enum ProjectType {
     Node,
     Rust,
     Toml,
+    Versionfile,
     Yaml,
 }
 
@@ -37,6 +39,9 @@ pub fn get_project_file(settings: ProjectSettings, repo_path: PathBuf) -> Box<dy
         ProjectType::Node => Box::new(node::NodeProject::new(settings, repo_path)),
         ProjectType::Rust => Box::new(rust::RustProject::new(settings, repo_path)),
         ProjectType::Toml => Box::new(toml::TomlProject::new(settings, repo_path)),
+        ProjectType::Versionfile => {
+            Box::new(versionfile::VersionfileProject::new(settings, repo_path))
+        }
         ProjectType::Yaml => Box::new(yaml::YamlProject::new(settings, repo_path)),
     }
 }

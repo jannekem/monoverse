@@ -69,6 +69,9 @@ impl ProjectSettings {
             ProjectType::Node => self.project_path.join("package.json"),
             ProjectType::Rust => self.project_path.join("Cargo.toml"),
             ProjectType::Toml => Err(anyhow::anyhow!("TOML project requires a manifest path"))?,
+            ProjectType::Versionfile => Err(anyhow::anyhow!(
+                "Versionfile project requires a manifest path"
+            ))?,
             ProjectType::Yaml => Err(anyhow::anyhow!("YAML project requires a manifest path"))?,
         };
         Ok(path.strip_prefix("./").unwrap_or(&path).to_path_buf())

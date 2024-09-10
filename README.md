@@ -75,14 +75,14 @@ Applications are defined in the `projects` section of the configuration file.
 
 Each project is represented by a key-value pair, where the key is the name of the project and the value is a map with the following keys:
 
-| Key             | Description                                   | Allowed values                                                                                                                                                      |
-| --------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `type`          | The type of the project.                      | `rust`, `node`, `helm`, `toml`, `yaml`                                                                                                                              |
-| `path`          | The path to the project.                      | Any valid directory path relative to the repository root. If omitted, the repository root is used instead.                                                          |
-| `manifest_path` | The path to the manifest file of the project. | Any valid file path relative to the project root. If omitted, the manifest file is assumed to be located at the project path.                                       |
-| `tag_prefix`    | Prefix for tag creation.                      | A string that will be prefixed to the version number when creating a new tag. Can be set to an empty string if no prefix is desired. Defaults to `<project-name>-`. |
-| `selector`      | The selector for the version number.          | The format of the selector depends on the `type` of the project.                                                                                                    |
-| `dependents`    | The dependents of the project.                | A list of dependent files which should be updated when the project is released. For more information, see the [Project dependents](#project-dependents) section.    |
+| Key             | Description                                   | Allowed values                                                                                                                                                                                        |
+| --------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type`          | The type of the project.                      | `rust`, `node`, `helm`, `toml`, `versionfile`, `yaml`                                                                                                                                                 |
+| `path`          | The path to the project.                      | Any valid directory path relative to the repository root. If omitted, the repository root is used instead.                                                                                            |
+| `manifest_path` | The path to the manifest file of the project. | Any valid file path relative to the project root. If omitted, the manifest file is assumed to be located at the project path. Generic project types such as `yaml` require an explicit manifest path. |
+| `tag_prefix`    | Prefix for tag creation.                      | A string that will be prefixed to the version number when creating a new tag. Can be set to an empty string if no prefix is desired. Defaults to `<project-name>-`.                                   |
+| `selector`      | The selector for the version number.          | The format of the selector depends on the `type` of the project.                                                                                                                                      |
+| `dependents`    | The dependents of the project.                | A list of dependent files which should be updated when the project is released. For more information, see the [Project dependents](#project-dependents) section.                                      |
 
 Selector formats for project types that use the `selector` key:
 
@@ -91,6 +91,14 @@ Selector formats for project types that use the `selector` key:
 | `toml`       | Dot-separated path to the version number in the TOML file. For example: `package.version` |
 | `yaml`       | Dot-separated path to the version number in the YAML file. For example: `package.version` |
 
+Project types:
+
+- `rust`: A Rust project with a `Cargo.toml` manifest file.
+- `node`: A Node.js project with a `package.json` manifest file.
+- `helm`: A Helm chart with a `Chart.yaml` manifest file.
+- `toml`: Any generic project with a TOML manifest file.
+- `versionfile`: Any generic project with a version file that only contains the version number.
+- `yaml`: Any generic project with a YAML manifest file.
 
 ### Project dependents
 
