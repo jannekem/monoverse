@@ -38,6 +38,9 @@ pub struct Release {
     /// Create a tag
     #[clap(long, requires = "commit")]
     pub tag: bool,
+    /// Run `helm dependency update` for helm dependents
+    #[clap(long)]
+    pub helm_dependency_update: bool,
 }
 
 #[derive(Parser)]

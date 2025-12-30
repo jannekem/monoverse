@@ -89,7 +89,7 @@ Selector formats for project types that use the `selector` key:
 | Project type | Selector format                                                                           |
 | ------------ | ----------------------------------------------------------------------------------------- |
 | `toml`       | Dot-separated path to the version number in the TOML file. For example: `package.version` |
-| `yaml`       | Dot-separated path to the version number in the YAML file. For example: `package.version` |
+| `yaml`       | Dot-separated path, with optional sequence selectors. For example: `package.version` or `groups[name=app].dependencies[0].version` |
 
 Project types:
 
@@ -110,8 +110,8 @@ Dependent settings can contain the following keys:
 
 | Key        | Description                                                | Allowed values                                                                                                              |
 | ---------- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `type`     | The type of the dependent.                                 | `regex`, `toml`, `yaml`                                                                                                     |
-| `path`     | The path to the dependent file.                            | Any valid file path relative to the project root.                                                                           |
+| `type`     | The type of the dependent.                                 | `regex`, `toml`, `yaml`, `helm`                                                                                              |
+| `path`     | The path to the dependent file.                            | Any valid file path relative to the project root. For `helm` dependents, use the chart directory.                           |
 | `selector` | The selector for the version number in the dependent file. | A selector for the version number in the dependent file. The format of the selector depends on the `type` of the dependent. |
 | `replace`  | String to replace the selector match with.                 | A format string to replace the selector match with. The format of the string depends on the `type` of the dependent.        |
 
@@ -121,7 +121,8 @@ Selector formats for different dependent types:
 | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `regex`        | A regular expression that matches any text in the dependent file. Note that you will need to escape characters that would otherwise be interpreted by the YAML/TOML parsing. For example: `v\\d+\\.\\d+\\.\\d+` |
 | `toml`         | Dot-separated path to the version number in the TOML file. For example: `dependencies.server.version`                                                                                                           |
-| `yaml`         | Dot-separated path to the version number in the YAML file. For example: `dependencies.server.version`                                                                                                           |
+| `yaml`         | Dot-separated path with optional sequence selectors. For example: `dependencies.server.version` or `groups[name=app].dependencies[name=common].version`                                                           |
+| `helm`         | Dot-separated path with optional sequence selectors. For example: `dependencies[name=common].version`                                                                                                           |
 
 Replace formats for different dependent types:
 
@@ -130,8 +131,11 @@ Replace formats for different dependent types:
 | `regex`        | A format string that replaces the matching text in the dependent file. Defaults to the new version string. For example: `v{{version}}` |
 | `toml`         | N/A                                                                                                                                    |
 | `yaml`         | N/A                                                                                                                                    |
+| `helm`         | N/A                                                                                                                                    |
 
 The `replace` string can contain the `{{version}}` placeholder, which will be replaced with the new version number when the project is released.
+
+For `helm` dependents, `monoverse` can run `helm dependency update` in the chart directory after updating `Chart.yaml`, which updates `Chart.lock` and may write `.tgz` archives under `charts/`. This is controlled by the `--helm-dependency-update` flag and requires Helm on `PATH`.
 
 ### Example YAML configuration
 
@@ -210,6 +214,7 @@ The following arguments are also available:
 - `-f`, `--force`: Force a release even if the project has no changes.
 - `--commit`: Commit the changes to the repository.
 - `--tag`: Create a new tag in the repository, requires `--commit`. By default, the tag format is `<project>-<version>`. It can be customized by configuring the `tag_prefix` key in the configuration file for each project.
+- `--helm-dependency-update`: Run `helm dependency update` for `helm` dependents after updating `Chart.yaml`.
 
 ### Next
 
