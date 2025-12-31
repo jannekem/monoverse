@@ -13,7 +13,11 @@ pub struct YamlDepedent {
 }
 
 impl Dependent for YamlDepedent {
-    fn update_version(&self, version: &Version) -> Result<()> {
+    fn update_version(
+        &self,
+        version: &Version,
+        _options: &super::DependentUpdateOptions,
+    ) -> Result<Vec<PathBuf>> {
         let file_path = &self.settings.dependent_path;
         let repo_path = &self.repo_path;
         let selector = self
@@ -25,10 +29,6 @@ impl Dependent for YamlDepedent {
         let new_file_content =
             crate::edit::yaml::edit(&file_content, &selector, &version.to_string())?;
         crate::io::write_file(file_path, repo_path, new_file_content.as_str())?;
-        Ok(())
-    }
-
-    fn get_file_path(&self) -> PathBuf {
-        self.settings.dependent_path.clone()
+        Ok(vec![self.settings.dependent_path.clone()])
     }
 }

@@ -59,14 +59,17 @@ fn handle_release(
         .flatten()
         .map(|dependent| dependents::get_dependent(dependent, repo_path.clone()))
         .collect::<Result<Vec<_>>>()?;
+    let dependent_options = dependents::DependentUpdateOptions {
+        helm_dependency_update: release.helm_dependency_update,
+    };
     if let Some(version) = project_file
         .release(&repo, release.force)
         .with_context(|| format!("Failed to release '{}'", release.project))?
     {
         let mut file_paths = Vec::new();
         for dependent in dependents {
-            dependent.update_version(&version)?;
-            file_paths.push(dependent.get_file_path());
+            let mut dependent_paths = dependent.update_version(&version, &dependent_options)?;
+            file_paths.append(&mut dependent_paths);
         }
         if release.commit {
             file_paths.push(project_file.get_manifest_file_path()?);

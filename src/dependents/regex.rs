@@ -13,7 +13,11 @@ pub struct RegexDependent {
 }
 
 impl Dependent for RegexDependent {
-    fn update_version(&self, version: &Version) -> Result<()> {
+    fn update_version(
+        &self,
+        version: &Version,
+        _options: &super::DependentUpdateOptions,
+    ) -> Result<Vec<PathBuf>> {
         let file_content = crate::io::read_file(&self.settings.dependent_path, &self.repo_path)?;
         let new_file_content = update_regex(&file_content, version, &self.settings)?;
         crate::io::write_file(
@@ -21,11 +25,7 @@ impl Dependent for RegexDependent {
             &self.repo_path,
             new_file_content.as_str(),
         )?;
-        Ok(())
-    }
-
-    fn get_file_path(&self) -> PathBuf {
-        self.settings.dependent_path.clone()
+        Ok(vec![self.settings.dependent_path.clone()])
     }
 }
 
