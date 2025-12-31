@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.8](https://github.com/jannekem/monoverse/compare/v0.1.7...v0.1.8) - 2025-12-31
+
+### Added
+
+- *(helm)* add helm dependents and sequence selectors
+
+### Other
+
+- streamline documentation
+- fix release pipeline
+- add mdbook documentation
+
 ## [0.1.7](https://github.com/jannekem/monoverse/compare/v0.1.6...v0.1.7) - 2024-09-10
 
 ### Added
