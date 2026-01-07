@@ -29,3 +29,9 @@ Print the next version without editing files:
 ```bash
 monoverse next server
 ```
+
+List configured projects:
+
+```bash
+monoverse list
+```

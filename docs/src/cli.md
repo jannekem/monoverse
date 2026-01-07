@@ -6,6 +6,7 @@ Usage: monoverse [OPTIONS] <COMMAND>
 Commands:
   release  Release a project
   next     Print the next version for a project
+  list     List projects
   help     Print this message or the help of the given subcommand(s)
 
 Options:
@@ -37,6 +38,14 @@ Print the next version without modifying files:
 
 ```bash
 monoverse next <project>
+```
+
+## list
+
+List all configured projects:
+
+```bash
+monoverse list
 ```
 
 ## repo path
