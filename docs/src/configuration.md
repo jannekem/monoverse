@@ -19,7 +19,7 @@ Each project is defined in the `projects` map. The project key is the project na
 
 - `rust`: A Rust project with a `Cargo.toml` manifest file.
 - `node`: A Node.js project with a `package.json` manifest file.
-- `helm`: A Helm chart with a `Chart.yaml` manifest file. Uses `appVersion` for release detection and updates `appVersion` plus the chart `version`.
+- `helm`: A Helm chart with a `Chart.yaml` manifest file. Uses `version` for release detection, updates `version` to the next CalVer, and updates `appVersion` if present.
 - `toml`: Any generic project with a TOML manifest file. Requires `manifest_path` and `selector`.
 - `versionfile`: Any generic project with a version file that only contains the version number. Requires `manifest_path`.
 - `yaml`: Any generic project with a YAML manifest file. Requires `manifest_path` and `selector`.

@@ -4,24 +4,12 @@ Monoverse supports Helm charts both as projects and as dependents.
 
 ## Helm projects
 
-`type: helm` expects a chart with `Chart.yaml` and uses `appVersion` for release detection. On release it updates:
+`type: helm` expects a chart with `Chart.yaml` and uses `version` for release detection. On release it updates:
 
-- `appVersion` to the next CalVer
-- `version` by bumping the patch number
+- `version` to the next CalVer
+- `appVersion` if present
 
-This is a good fit when the chart tracks the application version directly.
-
-## Library charts
-
-Library charts do not have `appVersion`. In that case, use a `yaml` project and point the selector at `version`:
-
-```yaml
-projects:
-  common:
-    type: yaml
-    manifest_path: charts/common/Chart.yaml
-    selector: version
-```
+The versioning is similar for both application and library charts.
 
 ## Helm dependents
 

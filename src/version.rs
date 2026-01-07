@@ -61,15 +61,6 @@ impl Version {
             }
         }
     }
-
-    /// Bump patch version
-    pub fn bump_patch(&self) -> Self {
-        Self {
-            major: self.major,
-            minor: self.minor,
-            patch: self.patch + 1,
-        }
-    }
 }
 
 impl VersionContext {
