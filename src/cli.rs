@@ -23,6 +23,8 @@ pub enum SubCommand {
     Release(Release),
     /// Print the next version for a project
     Next(Next),
+    /// List projects
+    List(List),
 }
 
 #[derive(Parser)]
@@ -48,3 +50,6 @@ pub struct Next {
     /// Project name
     pub project: String,
 }
+
+#[derive(Parser)]
+pub struct List {}

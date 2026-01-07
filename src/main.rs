@@ -41,6 +41,9 @@ fn run() -> Result<()> {
         cli::SubCommand::Next(next) => {
             handle_next(next, settings, opts.repo_path.unwrap())?;
         }
+        cli::SubCommand::List(_) => {
+            handle_list(settings)?;
+        }
     }
     Ok(())
 }
@@ -96,5 +99,14 @@ fn handle_next(next: cli::Next, settings: settings::Settings, repo_path: PathBuf
     let project_settings = settings.project_settings(&next.project)?;
     let project_file = projects::get_project_file(project_settings.clone(), repo_path);
     project_file.print_next_version()?;
+    Ok(())
+}
+
+fn handle_list(settings: settings::Settings) -> Result<()> {
+    let mut names: Vec<_> = settings.projects.keys().collect();
+    names.sort();
+    for name in names {
+        println!("{}", name);
+    }
     Ok(())
 }
