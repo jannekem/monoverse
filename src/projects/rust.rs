@@ -1,6 +1,6 @@
 use anyhow::Result;
 use std::path::PathBuf;
-use toml_edit::{value, Document};
+use toml_edit::{value, DocumentMut};
 
 use crate::{
     settings::ProjectSettings,
@@ -31,7 +31,7 @@ impl super::ProjectFile for RustProject {
         &self,
         version_file_content: &str,
     ) -> anyhow::Result<crate::version::VersionContext> {
-        let doc = version_file_content.parse::<Document>()?;
+        let doc = version_file_content.parse::<DocumentMut>()?;
         let version = doc["package"]["version"]
             .as_str()
             .ok_or(anyhow::anyhow!(
@@ -65,7 +65,7 @@ impl super::ProjectFile for RustProject {
         version_file_content: &str,
         version_context: &VersionContext,
     ) -> Result<String> {
-        let mut doc = version_file_content.parse::<Document>()?;
+        let mut doc = version_file_content.parse::<DocumentMut>()?;
         doc["package"]["version"] = value(version_context.next_version.to_string());
         Ok(doc.to_string())
     }

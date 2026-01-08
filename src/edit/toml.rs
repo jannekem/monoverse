@@ -1,5 +1,5 @@
 use anyhow::Result;
-use toml_edit::{value, Document, Item};
+use toml_edit::{value, DocumentMut, Item};
 
 use super::LineContext;
 
@@ -20,7 +20,7 @@ use super::LineContext;
 ///
 /// Arrays of tables are not supported.
 pub fn edit(file_content: &str, selector: &str, new_value: &str) -> Result<String> {
-    let mut doc = file_content.parse::<Document>()?;
+    let mut doc = file_content.parse::<DocumentMut>()?;
     set_value(&mut doc, selector, new_value)?;
     Ok(doc.to_string())
 }
@@ -28,7 +28,7 @@ pub fn edit(file_content: &str, selector: &str, new_value: &str) -> Result<Strin
 /// Query a TOML file for a value
 pub fn query(file_content: &str, selector: &str) -> Result<LineContext> {
     log::info!("Querying TOML file for selector: {}", selector);
-    let mut doc = file_content.parse::<Document>()?;
+    let mut doc = file_content.parse::<DocumentMut>()?;
     let value = {
         let value = get_value(&doc, selector)?.as_str().ok_or(anyhow::anyhow!(
             "Failed to parse value from TOML file for selector: {}",
@@ -47,7 +47,7 @@ pub fn query(file_content: &str, selector: &str) -> Result<LineContext> {
     Ok(LineContext { line_number, value })
 }
 
-fn get_value<'a>(doc: &'a Document, selector: &str) -> Result<&'a Item> {
+fn get_value<'a>(doc: &'a DocumentMut, selector: &str) -> Result<&'a Item> {
     let keys = selector.split('.').collect::<Vec<_>>();
     if keys.len() == 1 {
         Ok(&doc[keys[0]])
@@ -62,7 +62,7 @@ fn get_value<'a>(doc: &'a Document, selector: &str) -> Result<&'a Item> {
     }
 }
 
-fn set_value(doc: &mut Document, selector: &str, new_value: &str) -> Result<()> {
+fn set_value(doc: &mut DocumentMut, selector: &str, new_value: &str) -> Result<()> {
     let keys = selector.split('.').collect::<Vec<_>>();
     if keys.len() == 1 {
         doc[keys[0]] = value(new_value);
