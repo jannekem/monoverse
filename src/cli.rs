@@ -4,16 +4,16 @@ use clap::Parser;
 use clap_verbosity_flag::{Verbosity, WarnLevel};
 
 #[derive(Parser)]
-#[clap(name = env!("CARGO_PKG_NAME"), version = env!("CARGO_PKG_VERSION"))]
+#[command(name = env!("CARGO_PKG_NAME"), version = env!("CARGO_PKG_VERSION"))]
 pub struct Opts {
-    #[clap(subcommand)]
+    #[command(subcommand)]
     pub subcmd: SubCommand,
 
     /// Repository path
-    #[clap(long, default_value = ".", global = true)]
+    #[arg(long, default_value = ".", global = true)]
     pub repo_path: Option<PathBuf>,
 
-    #[clap(flatten)]
+    #[command(flatten)]
     pub verbosity: Verbosity<WarnLevel>,
 }
 
@@ -32,16 +32,16 @@ pub struct Release {
     /// Project name
     pub project: String,
     /// Force release
-    #[clap(long, short)]
+    #[arg(long, short)]
     pub force: bool,
     /// Commit changes
-    #[clap(long)]
+    #[arg(long)]
     pub commit: bool,
     /// Create a tag
-    #[clap(long, requires = "commit")]
+    #[arg(long, requires = "commit")]
     pub tag: bool,
     /// Run `helm dependency update` for helm dependents
-    #[clap(long)]
+    #[arg(long)]
     pub helm_dependency_update: bool,
 }
 
