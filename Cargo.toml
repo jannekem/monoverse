@@ -22,7 +22,7 @@ git2 = "0.20.3"
 libyaml-safer = "0.3.0"
 log = "0.4.29"
 regex = "1.12.2"
-serde = { version = "1.0.195", features = ["derive"] }
+serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.111"
 serde_yaml = "0.9.30"
 stderrlog = { version = "0.6.0", default-features = false }
