@@ -6,6 +6,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.8](https://github.com/jannekem/monoverse/compare/v0.1.7...v0.1.8) - 2026-01-08
+
+### Added
+
+- add list command
+- update helm to use version instead of appVersion
+- *(helm)* add helm dependents and sequence selectors
+
+### Fixed
+
+- use clap command attributes
+- bump toml_edit to 0.24.0
+- normalize manifest paths for git2
+
+### Other
+
+- drop serde_yaml dependency
+- bump serde_json to 1.0.149
+- bump serde to 1.0.228
+- bump regex to 1.12.2
+- bump log to 0.4.29
+- bump clap to 4.5.54
+- bump chrono to 0.4.42
+- bump anyhow to 1.0.100
+- bump thiserror to 2.0.17
+- bump stderrlog to 0.6.0
+- bump libyaml-safer to 0.3.0
+- bump git2 to 0.20.3
+- bump config to 0.15.19
+- bump clap-verbosity-flag to 3.0.4
+- document list feature
+- streamline documentation
+- fix release pipeline
+- add mdbook documentation
+
 ## [0.1.7](https://github.com/jannekem/monoverse/compare/v0.1.6...v0.1.7) - 2024-09-10
 
 ### Added
