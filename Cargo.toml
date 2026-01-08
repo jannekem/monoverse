@@ -18,7 +18,7 @@ chrono = "0.4.31"
 clap = { version = "4.4.16", features = ["derive"] }
 clap-verbosity-flag = "3.0.4"
 config = "0.15.19"
-git2 = "0.18.1"
+git2 = "0.20.3"
 libyaml-safer = "0.1.1"
 log = "0.4.20"
 regex = "1.10.3"
