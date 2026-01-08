@@ -55,14 +55,14 @@ impl Settings {
 impl ProjectSettings {
     /// Return the path to the version file for each project type
     ///
-    /// If the project path is defined as "." then it is stripped
-    /// from the joined path so that the version file path works
-    /// with the git2 library.
-    ///
-    /// If the manifest path is defined, then it is used instead
+    /// If the resolved manifest path starts with "./", it is stripped
+    /// so that the version file path works with the git2 library.
     pub fn get_manifest_file_path(&self) -> Result<PathBuf> {
         if let Some(manifest_path) = &self.manifest_path {
-            return Ok(manifest_path.to_path_buf());
+            return Ok(manifest_path
+                .strip_prefix(Path::new("."))
+                .unwrap_or(manifest_path)
+                .to_path_buf());
         }
         let path = match self.project_type {
             ProjectType::Helm => self.project_path.join("Chart.yaml"),
@@ -74,6 +74,56 @@ impl ProjectSettings {
             ))?,
             ProjectType::Yaml => Err(anyhow::anyhow!("YAML project requires a manifest path"))?,
         };
-        Ok(path.strip_prefix("./").unwrap_or(&path).to_path_buf())
+        Ok(path
+            .strip_prefix(Path::new("."))
+            .unwrap_or(&path)
+            .to_path_buf())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_manifest_path_strips_dot_prefix_when_configured() {
+        let settings = ProjectSettings {
+            project_type: ProjectType::Helm,
+            project_path: PathBuf::new(),
+            manifest_path: Some(PathBuf::from("./Chart.yaml")),
+            tag_prefix: None,
+            selector: None,
+            dependents: None,
+        };
+        let path = settings.get_manifest_file_path().unwrap();
+        assert_eq!(path, PathBuf::from("Chart.yaml"));
+    }
+
+    #[test]
+    fn test_manifest_path_strips_dot_prefix_when_derived() {
+        let settings = ProjectSettings {
+            project_type: ProjectType::Helm,
+            project_path: PathBuf::from("./charts/app"),
+            manifest_path: None,
+            tag_prefix: None,
+            selector: None,
+            dependents: None,
+        };
+        let path = settings.get_manifest_file_path().unwrap();
+        assert_eq!(path, PathBuf::from("charts/app/Chart.yaml"));
+    }
+
+    #[test]
+    fn test_manifest_path_keeps_configured_path_without_prefix() {
+        let settings = ProjectSettings {
+            project_type: ProjectType::Helm,
+            project_path: PathBuf::new(),
+            manifest_path: Some(PathBuf::from("charts/app/Chart.yaml")),
+            tag_prefix: None,
+            selector: None,
+            dependents: None,
+        };
+        let path = settings.get_manifest_file_path().unwrap();
+        assert_eq!(path, PathBuf::from("charts/app/Chart.yaml"));
     }
 }
