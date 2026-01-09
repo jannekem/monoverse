@@ -1,5 +1,5 @@
 # Build Stage
-FROM rust:1.76 as builder
+FROM rust:1.92 as builder
 WORKDIR /usr/src
 
 COPY ./Cargo.toml ./Cargo.toml
