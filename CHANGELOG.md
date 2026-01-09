@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.9](https://github.com/jannekem/monoverse/compare/v0.1.8...v0.1.9) - 2026-01-09
+
+### Fixed
+
+- improve toml selector errors
+- prevent toml selector panics
+
+### Other
+
+- update Rust in Dockerfile
+- Merge pull request #27 from jannekem/fix/toml-panic
+
 ## [0.1.8](https://github.com/jannekem/monoverse/compare/v0.1.7...v0.1.8) - 2026-01-08
 
 ### Added
