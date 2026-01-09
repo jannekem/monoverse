@@ -47,34 +47,86 @@ pub fn query(file_content: &str, selector: &str) -> Result<LineContext> {
     Ok(LineContext { line_number, value })
 }
 
-fn get_value<'a>(doc: &'a DocumentMut, selector: &str) -> Result<&'a Item> {
-    let keys = selector.split('.').collect::<Vec<_>>();
-    if keys.len() == 1 {
-        Ok(&doc[keys[0]])
-    } else {
-        let mut item = &doc[keys[0]];
-        assert_not_array_of_tables(item)?;
-        for key in &keys[1..keys.len() - 1] {
-            item = &item[key];
-            assert_not_array_of_tables(item)?;
-        }
-        Ok(&item[keys[keys.len() - 1]])
+fn split_selector(selector: &str) -> Result<Vec<&str>> {
+    if selector.is_empty() {
+        return Err(anyhow::anyhow!("Selector cannot be empty"));
     }
+    if selector.starts_with('.') || selector.ends_with('.') || selector.contains("..") {
+        return Err(anyhow::anyhow!("Invalid selector: {}", selector));
+    }
+    Ok(selector.split('.').collect())
 }
 
-fn set_value(doc: &mut DocumentMut, selector: &str, new_value: &str) -> Result<()> {
-    let keys = selector.split('.').collect::<Vec<_>>();
+fn get_value<'a>(doc: &'a DocumentMut, selector: &str) -> Result<&'a Item> {
+    let keys = split_selector(selector)?;
+    let mut processed_keys = Vec::new();
+    let mut item = doc
+        .get(keys[0])
+        .ok_or_else(|| anyhow::anyhow!("Key not found: {}", keys[0]))?;
+    processed_keys.push(keys[0]);
+    assert_not_array_of_tables(item)?;
     if keys.len() == 1 {
-        doc[keys[0]] = value(new_value);
-    } else {
-        let mut item = &mut doc[keys[0]];
-        assert_not_array_of_tables(item)?;
-        for key in &keys[1..keys.len() - 1] {
-            item = &mut item[key];
-            assert_not_array_of_tables(item)?;
-        }
-        item[keys[keys.len() - 1]] = value(new_value);
+        return Ok(item);
     }
+    for key in &keys[1..keys.len() - 1] {
+        let table = item.as_table_like().ok_or_else(|| {
+            anyhow::anyhow!("Value for '{}' is not a table", processed_keys.join("."))
+        })?;
+        let next_path = format!("{}.{}", processed_keys.join("."), key);
+        item = table
+            .get(key)
+            .ok_or_else(|| anyhow::anyhow!("Key '{}' not found", next_path))?;
+        processed_keys.push(*key);
+        assert_not_array_of_tables(item)?;
+    }
+    let table = item.as_table_like().ok_or_else(|| {
+        anyhow::anyhow!("Value for '{}' is not a table", processed_keys.join("."))
+    })?;
+    let last_key = keys[keys.len() - 1];
+    let last_path = format!("{}.{}", processed_keys.join("."), last_key);
+    let item = table
+        .get(last_key)
+        .ok_or_else(|| anyhow::anyhow!("Key '{}' not found", last_path))?;
+    Ok(item)
+}
+
+// Similar to get_value, but mutable
+fn set_value(doc: &mut DocumentMut, selector: &str, new_value: &str) -> Result<()> {
+    let keys = split_selector(selector)?;
+    if keys.len() == 1 {
+        let key = keys[0];
+        if doc.get(key).is_none() {
+            return Err(anyhow::anyhow!("Key not found: {}", key));
+        }
+        doc[key] = value(new_value);
+        return Ok(());
+    }
+    let mut processed_keys = Vec::new();
+    let mut item = doc
+        .get_mut(keys[0])
+        .ok_or_else(|| anyhow::anyhow!("Key not found: {}", keys[0]))?;
+    processed_keys.push(keys[0]);
+    assert_not_array_of_tables(item)?;
+    for key in &keys[1..keys.len() - 1] {
+        let table = item.as_table_like_mut().ok_or_else(|| {
+            anyhow::anyhow!("Value for '{}' is not a table", processed_keys.join("."))
+        })?;
+        let next_path = format!("{}.{}", processed_keys.join("."), key);
+        item = table
+            .get_mut(key)
+            .ok_or_else(|| anyhow::anyhow!("Key '{}' not found", next_path))?;
+        processed_keys.push(*key);
+        assert_not_array_of_tables(item)?;
+    }
+    let table = item.as_table_like_mut().ok_or_else(|| {
+        anyhow::anyhow!("Value for '{}' is not a table", processed_keys.join("."))
+    })?;
+    let last_key = keys[keys.len() - 1];
+    let last_path = format!("{}.{}", processed_keys.join("."), last_key);
+    let target = table
+        .get_mut(last_key)
+        .ok_or_else(|| anyhow::anyhow!("Key '{}' not found", last_path))?;
+    *target = value(new_value);
     Ok(())
 }
 
@@ -186,5 +238,29 @@ serde_json = "1.0.111"
         let line_context = query(file_content, selector).unwrap();
         assert_eq!(line_context.value, "1.0.195");
         assert_eq!(line_context.line_number, 2);
+    }
+
+    #[test]
+    fn test_query_invalid_selector_empty() {
+        let file_content = r#"version = "1.0.0""#;
+        let result = query(file_content, "");
+        assert!(result.is_err());
+        assert!(result
+            .err()
+            .unwrap()
+            .to_string()
+            .contains("Selector cannot be empty"));
+    }
+
+    #[test]
+    fn test_edit_invalid_selector_dots() {
+        let file_content = r#"version = "1.0.0""#;
+        let result = edit(file_content, "version.", "1.0.1");
+        assert!(result.is_err());
+        assert!(result
+            .err()
+            .unwrap()
+            .to_string()
+            .contains("Invalid selector"));
     }
 }
