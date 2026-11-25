@@ -21,7 +21,7 @@ jobs:
         with:
           toolchain: stable
       - name: Run tests
-        run: cargo test --all-targets
+        run: cargo test --all-targets --locked
       - name: Run release-plz
         uses: release-plz/action@v0.5
         with:
