@@ -6,6 +6,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.10](https://github.com/jannekem/monoverse/compare/v0.1.9...v0.1.10) - 2026-11-27
+
+### Fixed
+
+- *(deps)* upgrade git2 to 0.21.0 ([#37](https://github.com/jannekem/monoverse/pull/37))
+- *(helm)* respect ignored dependency archives when committing ([#30](https://github.com/jannekem/monoverse/pull/30))
+
+### Other
+
+- *(docker)* update runtime image and trim packages ([#39](https://github.com/jannekem/monoverse/pull/39))
+- *(deps)* update Rust dependencies ([#38](https://github.com/jannekem/monoverse/pull/38))
+- remove duplicate Rust cache step ([#36](https://github.com/jannekem/monoverse/pull/36))
+- migrate remaining actions to Node.js 24 ([#35](https://github.com/jannekem/monoverse/pull/35))
+- *(deps)* track Cargo.lock and enforce locked builds ([#34](https://github.com/jannekem/monoverse/pull/34))
+- *(deps)* remove unused thiserror dependency ([#33](https://github.com/jannekem/monoverse/pull/33))
+- upgrade checkout action to Node.js 24 ([#32](https://github.com/jannekem/monoverse/pull/32))
+
 ## [0.1.9](https://github.com/jannekem/monoverse/compare/v0.1.8...v0.1.9) - 2026-01-09
 
 ### Fixed
